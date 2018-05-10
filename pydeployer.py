@@ -1,7 +1,6 @@
-
 import subprocess
 import os
-
+from zipfile import ZipFile
 
 def build():
     #asume that we are already in the project root for now
@@ -16,6 +15,38 @@ def build():
     subprocess.run("dotnet publish -C Release -o /srv/dotnet/cartracker/tmp/ -r linux-x64")
 
     return True
+
+
+def package():
+    zipfile = "CarTracker.pydist"
+    create_zip_file("/srv/dotnet/cartracker/tmp/", zipfile)
+
+
+def get_all_file_paths(directory):
+    file_paths = []
+
+    for root, directories, files in os.walk(directory):
+        for filename in files:
+            file_paths.append(os.path.join(root, filename))
+
+    return file_paths
+
+
+def create_zip_file(directory, zip_name):
+    """ Creates a zipfile of the given directory """
+
+    with ZipFile(zip_name, "w") as zip:
+        for file in get_all_file_paths(directory):
+            zip.write(file)
+
+
+def main():
+    build()
+    package()
+
+
+if __name__ == "__main__":
+    main()
 
 """
 
