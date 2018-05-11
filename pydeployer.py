@@ -37,7 +37,7 @@ def create_zip_file(directory, zip_name):
 
     with ZipFile(zip_name, "w") as zip:
         for file in get_all_file_paths(directory):
-            zip.write(file)
+            zip.write(file, os.path.relpath(file, directory))
 
 
 def main():
