@@ -6,13 +6,13 @@ def build():
     #asume that we are already in the project root for now
 
     cwd = os.getcwd()
-    subprocess.run("dotnet restore")
+    subprocess.run("dotnet restore", shell=True)
 
     #TODO: Make yarn portion configurable
-    subprocess.run("yarn install", cwd=os.path.join(cwd, "CarTracker.Web"))
+    subprocess.run("yarn install", cwd=os.path.join(cwd, "CarTracker.Web"), shell=True)
 
     #TODO: CHange back to the home directory
-    subprocess.run("dotnet publish -C Release -o /srv/dotnet/cartracker/tmp/ -r linux-x64")
+    subprocess.run("dotnet publish -C Release -o /srv/dotnet/cartracker/tmp/ -r linux-x64", shell=True)
 
     return True
 
