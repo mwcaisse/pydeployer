@@ -12,7 +12,7 @@ def build():
     subprocess.run("yarn install", cwd=os.path.join(cwd, "CarTracker.Web"), shell=True)
 
     #TODO: CHange back to the home directory
-    subprocess.run("dotnet publish -C Release -o /srv/dotnet/cartracker/tmp/ -r linux-x64", shell=True)
+    subprocess.run("dotnet publish -c Release -o /srv/dotnet/cartracker/tmp/ -r linux-x64", shell=True)
 
     return True
 
