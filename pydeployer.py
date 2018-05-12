@@ -1,6 +1,7 @@
 import subprocess
 import os
 import json
+import shutil
 from zipfile import ZipFile
 
 
@@ -12,23 +13,25 @@ class Deployer:
     def build(self):
         #asume that we are already in the project root for now
         cwd = os.getcwd()
-        project_directory = os.path.join(cwd, self.config["name"])
+        root_directory = os.path.join(cwd, self.config["name"])
         build_directory = os.path.join(cwd, "build")
 
-        subprocess.run("dotnet restore", shell=True, cwd=project_directory)
+        subprocess.run("dotnet restore", shell=True, cwd=root_directory)
 
         # Perform any project specific build steps
         for project in self.config["subProjects"]:
             if project.get("type") == "web":
                 if project.get("packageManager") == "yarn":
                     subprocess.run("yarn install", shell=True,
-                                   cwd=os.path.join(project_directory, project["name"]))
+                                   cwd=os.path.join(root_directory, project["name"]))
 
                 subprocess.run("dotnet publish -c Release -o {0} -r linux-x64"
                                .format(os.path.join(build_directory, "web")), shell=True,
-                               cwd=os.path.join(project_directory, project["name"]))
+                               cwd=os.path.join(root_directory, project["name"]))
 
-
+            elif project.get("type") == "database":
+                script_directory = os.path.join(root_directory, project.get("name"), project.get("scriptDirectory"))
+                shutil.copytree(script_directory, os.path.join(build_directory, "database", "scripts"))
 
         self.package(build_directory)
 
