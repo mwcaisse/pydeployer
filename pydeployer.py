@@ -1,25 +1,35 @@
 import subprocess
 import os
+import json
 from zipfile import ZipFile
 
-def build():
-    #asume that we are already in the project root for now
 
-    cwd = os.getcwd()
-    subprocess.run("dotnet restore", shell=True)
+class Deployer()
 
-    #TODO: Make yarn portion configurable
-    subprocess.run("yarn install", cwd=os.path.join(cwd, "CarTracker.Web"), shell=True)
-
-    #TODO: CHange back to the home directory
-    subprocess.run("dotnet publish -c Release -o /srv/dotnet/cartracker/tmp/ -r linux-x64", shell=True)
-
-    return True
+    def __init__(self, config):
+        self.config = config
 
 
-def package():
-    zipfile = "CarTracker.pydist"
-    create_zip_file("/srv/dotnet/cartracker/tmp/", zipfile)
+    def build(self):
+        #asume that we are already in the project root for now
+        cwd = os.getcwd()
+
+        subprocess.run("dotnet restore", shell=True)
+
+        # Perform any project specific build steps
+        for project in self.config["subProjects"]:
+            if project.get("type") == "web":
+                if project.get("packageManager") == "yarn":
+                    subprocess.run("yarn install", cwd=os.path.join(cwd, project["name"]), shell=True)
+
+        subprocess.run("dotnet publish -c Release -o ./build -r linux-x64", shell=True)
+
+        return True
+
+
+    def package(self):
+        zipfile = "{0}.pydist".format(self.config["name"])
+        create_zip_file("./build", zipfile)
 
 
 def get_all_file_paths(directory):
@@ -40,9 +50,17 @@ def create_zip_file(directory, zip_name):
             zip.write(file, os.path.relpath(file, directory))
 
 
+def load_config():
+    with open("config.json") as config_file:
+        config = json.load(config_file)
+
+    return config
+
+
 def main():
-    build()
-    package()
+    deployer = Deployer(load_config())
+    deployer.build()
+    deployer.package()
 
 
 if __name__ == "__main__":

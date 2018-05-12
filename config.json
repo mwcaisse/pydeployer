@@ -1,0 +1,17 @@
+{
+  "name": "CarTracker",
+  "subProjects": [
+    {
+      "name": "CarTracker.Web",
+      "type": "web",
+      "packageManager": "yarn"
+    },
+    {
+      "name": "Database",
+      "type": "database",
+      "scriptDirectory": "VersionedScripts",
+      "versionPrefix": "V",
+      "versionSeparator": "_"
+    }
+  ]
+}
