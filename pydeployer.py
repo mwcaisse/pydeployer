@@ -13,6 +13,7 @@ class Deployer:
         #asume that we are already in the project root for now
         cwd = os.getcwd()
         project_directory = os.path.join(cwd, self.config["name"])
+        build_directory = os.path.join(cwd, "build")
 
         subprocess.run("dotnet restore", shell=True, cwd=project_directory)
 
@@ -23,14 +24,14 @@ class Deployer:
                     subprocess.run("yarn install", shell=True,
                                    cwd=os.path.join(project_directory, project["name"]))
 
-        subprocess.run("dotnet publish -c Release -o ./build -r linux-x64", shell=True,
+        subprocess.run("dotnet publish -c Release -o {0} -r linux-x64".format(build_directory), shell=True,
                        cwd=project_directory)
 
-        return True
+        self.package(build_directory)
 
-    def package(self):
+    def package(self, build_directory):
         zipfile = "{0}.pydist".format(self.config["name"])
-        create_zip_file("./build", zipfile)
+        create_zip_file(build_directory, zipfile)
 
 
 def get_all_file_paths(directory):
@@ -61,7 +62,6 @@ def load_config():
 def main():
     deployer = Deployer(load_config())
     deployer.build()
-    deployer.package()
 
 
 if __name__ == "__main__":
