@@ -13,15 +13,17 @@ class Deployer:
         #asume that we are already in the project root for now
         cwd = os.getcwd()
 
-        subprocess.run("dotnet restore", shell=True)
+        subprocess.run("dotnet restore", shell=True, cwd=os.path.join(cwd, self.config["name"]))
 
         # Perform any project specific build steps
         for project in self.config["subProjects"]:
             if project.get("type") == "web":
                 if project.get("packageManager") == "yarn":
-                    subprocess.run("yarn install", cwd=os.path.join(cwd, project["name"]), shell=True)
+                    subprocess.run("yarn install", shell=True,
+                                   cwd=os.path.join(cwd, self.config["name"], project["name"]))
 
-        subprocess.run("dotnet publish -c Release -o ./build -r linux-x64", shell=True)
+        subprocess.run("dotnet publish -c Release -o ./build -r linux-x64", shell=True,
+                       cwd=os.path.join(cwd, self.config["name"]))
 
         return True
 
