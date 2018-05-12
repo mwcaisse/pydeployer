@@ -4,11 +4,10 @@ import json
 from zipfile import ZipFile
 
 
-class Deployer()
+class Deployer:
 
     def __init__(self, config):
         self.config = config
-
 
     def build(self):
         #asume that we are already in the project root for now
@@ -25,7 +24,6 @@ class Deployer()
         subprocess.run("dotnet publish -c Release -o ./build -r linux-x64", shell=True)
 
         return True
-
 
     def package(self):
         zipfile = "{0}.pydist".format(self.config["name"])
