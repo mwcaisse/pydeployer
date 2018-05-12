@@ -24,8 +24,11 @@ class Deployer:
                     subprocess.run("yarn install", shell=True,
                                    cwd=os.path.join(project_directory, project["name"]))
 
-        subprocess.run("dotnet publish -c Release -o {0} -r linux-x64".format(build_directory), shell=True,
-                       cwd=project_directory)
+                subprocess.run("dotnet publish -c Release -o {0} -r linux-x64"
+                               .format(os.path.join(build_directory, "web")), shell=True,
+                               cwd=os.path.join(project_directory, project["name"]))
+
+
 
         self.package(build_directory)
 
