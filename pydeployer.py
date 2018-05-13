@@ -44,12 +44,12 @@ class Deployer:
 
     def run_git_command(self, command):
         command = "git -C {0} {1}".format(self.workspace_root, command)
-        res = subprocess.run(command, shell=True, cwd=self.workspace_root)
+        res = subprocess.run(command, shell=True, cwd=self.workspace_root, stdout=subprocess.PIPE, encoding="UTF-8")
         return str(res.stdout).strip()
 
     def create_build_tokens(self, directory):
         tokens = {
-            "build_date": time.time() * 1000,  # seconds to milliseconds
+            "build_date": int(time.time() * 1000),  # seconds to milliseconds
             "build_git_revision": self.run_git_command("rev-list --count HEAD"),
             "build_git_short_hash": self.run_git_command("rev-parse --short HEAD"),
             "build_git_long_hash": self.run_git_command("rev-parse HEAD"),
