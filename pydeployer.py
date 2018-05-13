@@ -2,6 +2,7 @@ import subprocess
 import os
 import json
 import shutil
+import time
 from zipfile import ZipFile
 
 
@@ -9,10 +10,11 @@ class Deployer:
 
     def __init__(self, config):
         self.config = config
+        self.workspace_root = os.getcwd()
 
     def build(self):
         #asume that we are already in the project root for now
-        cwd = os.getcwd()
+        cwd = self.workspace_root
         root_directory = os.path.join(cwd, self.config["name"])
         build_directory = os.path.join(cwd, "build")
 
@@ -33,11 +35,30 @@ class Deployer:
                 script_directory = os.path.join(root_directory, project.get("name"), project.get("scriptDirectory"))
                 shutil.copytree(script_directory, os.path.join(build_directory, "database", "scripts"))
 
+        self.create_build_tokens(build_directory)
         self.package(build_directory)
 
     def package(self, build_directory):
         zipfile = "{0}.pydist".format(self.config["name"])
         create_zip_file(build_directory, zipfile)
+
+    def run_git_command(self, command):
+        command = "git -C {0} {1}".format(self.workspace_root, command)
+        res = subprocess.run(command, shell=True, cwd=self.workspace_root)
+        return str(res.stdout).strip()
+
+    def create_build_tokens(self, directory):
+        tokens = {
+            "build_date": time.time() * 1000,  # seconds to milliseconds
+            "build_git_revision": self.run_git_command("rev-list --count HEAD"),
+            "build_git_short_hash": self.run_git_command("rev-parse --short HEAD"),
+            "build_git_long_hash": self.run_git_command("rev-parse HEAD"),
+            "build_git_branch": "master",  # hard coding for life
+            "build_number": 0,
+        }
+
+        with open(os.path.join(directory, "build_tokens.json"), "w") as tokens_file:
+            json.dump(tokens, tokens_file)
 
 
 def get_all_file_paths(directory):
