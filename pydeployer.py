@@ -35,6 +35,9 @@ class Deployer:
                 script_directory = os.path.join(root_directory, project.get("name"), project.get("scriptDirectory"))
                 shutil.copytree(script_directory, os.path.join(build_directory, "database", "scripts"))
 
+                with open(os.path.join(build_directory, "database", "config.json"), "w") as database_config_file:
+                    json.dump(project, database_config_file)
+
         self.create_build_tokens(build_directory)
         self.package(build_directory)
 
