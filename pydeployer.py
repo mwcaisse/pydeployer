@@ -3,6 +3,7 @@ import os
 import json
 import shutil
 import time
+import copy
 from zipfile import ZipFile
 
 
@@ -35,8 +36,10 @@ class Deployer:
                 script_directory = os.path.join(root_directory, project.get("name"), project.get("scriptDirectory"))
                 shutil.copytree(script_directory, os.path.join(build_directory, "database", "scripts"))
 
+                database_config = copy.deepcopy(project)
+                database_config["scriptDirectory"] = "scripts"
                 with open(os.path.join(build_directory, "database", "config.json"), "w") as database_config_file:
-                    json.dump(project, database_config_file)
+                    json.dump(database_config, database_config_file)
 
         self.create_build_tokens(build_directory)
         self.package(build_directory)
