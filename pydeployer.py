@@ -1,28 +1,51 @@
+import argparse
 import json
 import os
 
 from builder import Builder
 
 
-def load_config():
-    if not os.path.isfile("config.json"):
-        print("Could not load config file.")
+def load_config(config_file=None):
+    if not config_file:
+        config_file = "config.json"
+
+    if not os.path.isfile(config_file):
+        print("Could not load config file: {0}.".format(config_file))
         return None
-    with open("config.json") as config_file:
+    with open(config_file) as config_file:
         config = json.load(config_file)
 
     return config
 
 
-def main():
-    config = load_config()
+def build(options):
+    config = load_config(options.config_file)
     if config:
         builder = Builder(load_config())
         builder.build()
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("command", nargs="?", default="build", help="Command to execute: build, deploy. default: build")
+    parser.add_argument("deploy_file", nargs="?", default=None, help="File to deploy. Required if deploy is specified as command")
+
+    parser.add_argument("-c", "--config-file", dest="config_file", help="Location of the project's config file. " 
+                                                                        "default: config.json")
+
+    args = parser.parse_args()
+
+    if args.command == "build":
+        build(args)
+    elif args.command == "deploy":
+        if not args.deploy_file:
+            print("Deploy file is required.")
+        else:
+            print("We no deploy for now")
+    else:
+        print("Unknown command: " + args.command)
+
+
 
 """
 
