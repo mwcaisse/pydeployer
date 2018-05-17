@@ -4,7 +4,7 @@ import json
 import shutil
 import time
 import copy
-from zipfile import ZipFile
+from util import create_zip_file
 
 
 class Builder:
@@ -71,19 +71,4 @@ class Builder:
             json.dump(tokens, tokens_file)
 
 
-def get_all_file_paths(directory):
-    file_paths = []
 
-    for root, directories, files in os.walk(directory):
-        for filename in files:
-            file_paths.append(os.path.join(root, filename))
-
-    return file_paths
-
-
-def create_zip_file(directory, zip_name):
-    """ Creates a zipfile of the given directory """
-
-    with ZipFile(zip_name, "w") as zip:
-        for file in get_all_file_paths(directory):
-            zip.write(file, os.path.relpath(file, directory))

@@ -35,11 +35,11 @@ class FlywayDatabaseDeployer:
     def create_default_parameters():
         return {
             "installedBy": "pydeploy",
-            "cleanDisabled": True,
+            "cleanDisabled": "true",
             "sqlMigrationSeparator": "_",
             "sqlMigrationPrefix": "V",
             "baselineVersion": "0001",
-            "ignoreMissingMigrations": True,
+            "ignoreMissingMigrations": "true",
             "url": "",
             "user": "",
             "password": ""

@@ -1,8 +1,9 @@
+import os
 import re
 import json
 
 
-def replace_tokens_in_file(in_file, tokens, out_file=None):
+def replace_tokens_in_file(in_file, tokens, out_file=None, delete_after=False):
     if not out_file:
         out_file = in_file
     with open(in_file, "r") as file:
@@ -22,22 +23,11 @@ def replace_tokens_in_file(in_file, tokens, out_file=None):
     with open(out_file, "w") as file:
         file.write(content_replaced)
 
+    if delete_after:
+        os.remove(in_file)
+
     return True
 
 
 def remove_delimiters_from_key(key):
     return key.replace("[[", "").replace("]]", "")
-
-
-def test():
-
-    with open("./build_tokens.json", "r") as build_tokens_file:
-        tokens = json.load(build_tokens_file)
-
-    replace_tokens_in_file("./buildInformation_repl.pyb", tokens)
-
-
-if __name__ == "__main__":
-    test()
-
-
