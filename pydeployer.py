@@ -5,10 +5,7 @@ import os
 from builder import Builder
 
 
-def load_config(config_file=None):
-    if not config_file:
-        config_file = "config.json"
-
+def load_config(config_file):
     if not os.path.isfile(config_file):
         print("Could not load config file: {0}.".format(config_file))
         return None
@@ -30,8 +27,11 @@ if __name__ == "__main__":
     parser.add_argument("command", nargs="?", default="build", help="Command to execute: build, deploy. default: build")
     parser.add_argument("deploy_file", nargs="?", default=None, help="File to deploy. Required if deploy is specified as command")
 
-    parser.add_argument("-c", "--config-file", dest="config_file", help="Location of the project's config file. " 
-                                                                        "default: config.json")
+    parser.add_argument("-c", "--config-file", dest="config_file", default="config.json",
+                        help="Location of the project's config file. default: config.json")
+
+    parser.add_argument("-o", "--output-path", dest="output_path", default="/opt/apps/")
+    parser.add_argument("-p", "--project-directory", dest="project_directory", default=None)
 
     args = parser.parse_args()
 
