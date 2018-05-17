@@ -1,9 +1,9 @@
-import subprocess
 import os
 import shutil
 
 from token_replacer import replace_tokens_in_file
 from util import get_all_file_paths, empty_directory
+
 
 class WebDeployer:
 
