@@ -21,6 +21,10 @@ def create_zip_file(directory, zip_name):
         for file in get_all_file_paths(directory):
             zip.write(file, os.path.relpath(file, directory))
 
+def extract_zipfile(zip_file, destination):
+    """ Extracts the given zipfile to the given directory"""
+    with ZipFile(zip_file, "r") as zip:
+        zip.extractall(destination)
 
 def empty_directory(directory):
     for file in os.listdir(directory):

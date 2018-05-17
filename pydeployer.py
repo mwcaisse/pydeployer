@@ -3,6 +3,7 @@ import json
 import os
 
 from builder import Builder
+from util import extract_zipfile
 
 
 def load_config(config_file):
@@ -18,8 +19,21 @@ def load_config(config_file):
 def build(options):
     config = load_config(options.config_file)
     if config:
-        builder = Builder(load_config())
+        builder = Builder(config)
         builder.build()
+
+def deploy(options):
+    zipfile_name = os.path.basename(options.deploy_file)
+    project_name = zipfile_name.split(".")[0] # only allow one dot for now
+
+    staging_dir = project_name + "_pkg"
+    os.makedirs(staging_dir)
+
+
+    # Extract the zip file
+
+    # Run through each of the projects in the zip
+    #   Have a config file or just use folder names?
 
 
 if __name__ == "__main__":
@@ -41,7 +55,7 @@ if __name__ == "__main__":
         if not args.deploy_file:
             print("Deploy file is required.")
         else:
-            print("We no deploy for now")
+            deploy()
     else:
         print("Unknown command: " + args.command)
 
