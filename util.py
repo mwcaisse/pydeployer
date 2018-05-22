@@ -21,10 +21,12 @@ def create_zip_file(directory, zip_name):
         for file in get_all_file_paths(directory):
             zip.write(file, os.path.relpath(file, directory))
 
+
 def extract_zipfile(zip_file, destination):
     """ Extracts the given zipfile to the given directory"""
     with ZipFile(zip_file, "r") as zip:
         zip.extractall(destination)
+
 
 def empty_directory(directory):
     for file in os.listdir(directory):
@@ -33,3 +35,16 @@ def empty_directory(directory):
             os.remove(file_path)
         elif os.path.isdir(file_path):
             shutil.rmtree(file_path)
+
+
+def get_directories_in_directory(directory, relative=True):
+    directories = []
+
+    for file in os.listdir(directory):
+        if os.path.isdir(file):
+            path = file
+            if relative:
+                path = os.path.relpath(path, directory)
+            directories.append(path)
+
+    return directories

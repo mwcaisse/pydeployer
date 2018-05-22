@@ -3,7 +3,7 @@ import json
 import os
 
 from builder import Builder
-from util import extract_zipfile
+from util import extract_zipfile, get_directories_in_directory
 
 
 def load_config(config_file):
@@ -29,11 +29,33 @@ def deploy(options):
     staging_dir = project_name + "_pkg"
     os.makedirs(staging_dir)
 
-
     # Extract the zip file
+    extract_zipfile(staging_dir, options.deploy_file)
 
     # Run through each of the projects in the zip
     #   Have a config file or just use folder names?
+
+    for directory in get_directories_in_directory(staging_dir):
+        if directory == "Database":
+            config_file = os.path.join(staging_dir, directory, "config.json")
+            config = load_config(config_file)
+            # load config.json to get config file
+
+        elif directory == "Web":
+            pass
+
+
+def create_database_config(tokens, scripts_directory):
+    config = {
+        "user": tokens.get("database_deploy_user") or tokens["database_user"],
+        "password": tokens.get("database_deploy_password") or tokens["database_password"],
+        "host": tokens["database_host"],
+        "port": tokens["database_port"],
+        "schema": tokens["database_schema"],
+        "scripts_directory": tokens["scripts_directory"]
+    }
+    return config
+
 
 
 if __name__ == "__main__":
