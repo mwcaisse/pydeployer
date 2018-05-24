@@ -11,7 +11,7 @@ class FlywayDatabaseDeployer:
 
         print("Deploy: Running 'flyway {0}'".format(self.translate_parameters(parameters)))
 
-        subprocess.run("flyway", self.translate_parameters(parameters))
+        subprocess.run("flyway " + self.translate_parameters(parameters), shell=True)
 
     @staticmethod
     def translate_parameters(parameters):
@@ -21,7 +21,7 @@ class FlywayDatabaseDeployer:
         params = self.create_default_parameters()
         params.update({
             "user": self.config["user"],
-            "password": self.config["password"],
+            "password": "'{0}'".format(self.config["password"]),
             "url": "jdbc:mariadb://{host}:{port}/{schema}".format(
                 host=self.config.get("host", "localhost"),
                 port=self.config.get("port", "3306"),
@@ -32,8 +32,8 @@ class FlywayDatabaseDeployer:
             )
         })
 
-        self.copy_config_entry(params, self.config, "versionPrefix", "V")
-        self.copy_config_entry(params, self.config, "versionSeparator", "_")
+        self.copy_config_entry(self.config, "versionPrefix", params, "sqlMigrationPrefix" "V")
+        self.copy_config_entry(self.config, "versionSeparator", params, "sqlMigrationSeparator" "V")
         return params
 
     @staticmethod
@@ -52,8 +52,10 @@ class FlywayDatabaseDeployer:
 
     @staticmethod
     # TODO MOve this to a config utils file at some point?
-    def copy_config_entry(dest, source, key, default=None):
-        if key in source:
-            dest[key] = source[key]
+    def copy_config_entry(source, src_key, dest, dest_key=None, default=None):
+        if not dest_key:
+            dest_key = src_key
+        if src_key in source:
+            dest[dest_key] = source[src_key]
         elif default:
-            dest[key] = default
+            dest[dest_key] = default
