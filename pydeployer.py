@@ -38,7 +38,11 @@ def deploy(options):
     os.makedirs(staging_dir)
 
     # Extract the zip file
-    extract_zipfile(staging_dir, options.deploy_file)
+    print("Deploy: Extracting zipfile {zipfile} to {staging_dir}".format(
+        zipfile=options.deploy_file,
+        staging_dirs=staging_dir
+    ))
+    extract_zipfile(options.deploy_file, staging_dir)
 
     # Populate build tokens in tokens file if they exist
     build_tokens_file = os.path.join(staging_dir, "build_tokens.json")
