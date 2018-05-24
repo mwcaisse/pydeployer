@@ -42,11 +42,12 @@ def get_directories_in_directory(directory, relative=True):
     directories = []
 
     for file in os.listdir(directory):
-        if os.path.isdir(file):
-            path = file
+        full_path = os.path.join(directory, file)
+        if os.path.isdir(full_path):
             if relative:
-                path = os.path.relpath(path, directory)
-            directories.append(path)
+                directories.append(file)
+            else:
+                directories.append(full_path)
 
     return directories
 
