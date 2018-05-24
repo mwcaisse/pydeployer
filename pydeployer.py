@@ -40,7 +40,7 @@ def deploy(options):
     # Extract the zip file
     print("Deploy: Extracting zipfile {zipfile} to {staging_dir}".format(
         zipfile=options.deploy_file,
-        staging_dirs=staging_dir
+        staging_dir=staging_dir
     ))
     extract_zipfile(options.deploy_file, staging_dir)
 
