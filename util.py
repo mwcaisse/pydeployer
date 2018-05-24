@@ -1,4 +1,5 @@
 import os
+import re
 import shutil
 from zipfile import ZipFile
 
@@ -48,3 +49,14 @@ def get_directories_in_directory(directory, relative=True):
             directories.append(path)
 
     return directories
+
+
+def get_files_matching_pattern(directory, pattern):
+    files = []
+
+    pattern = re.compile(pattern)
+    for file in os.listdir(directory):
+        if os.path.isfile(file) and pattern.match(file):
+            files.append(os.path.relpath(file, directory))
+
+    return files

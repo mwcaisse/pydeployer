@@ -1,10 +1,13 @@
 import argparse
 import json
 import os
+import shutil
+import subprocess
 
 from builder import Builder
 from database_deployer import FlywayDatabaseDeployer
-from util import extract_zipfile, get_directories_in_directory
+from token_replacer import replace_tokens_in_file
+from util import extract_zipfile, get_directories_in_directory, empty_directory, get_files_matching_pattern
 
 
 def load_config(config_file):
@@ -56,6 +59,29 @@ def deploy(options):
             deployer.deploy()
 
         elif directory == "web":
+
+            # lets check if output-path/project-name/publish exists
+            publish_dir = os.path.join(options.output_path, project_name, "publish")
+            os.makedirs(publish_dir)
+
+            # end service?
+            subprocess.run("sudo systemctl stop {0}".format(project_name), shell=True)
+
+            # Clean out what is currently in publish dir
+            empty_directory(publish_dir)
+
+            # Copy project to publish dir
+            shutil.copytree(os.path.join(staging_dir, project_name), publish_dir)
+
+            # populate token files
+            pyb_files = get_files_matching_pattern(publish_dir, "*.pyb")
+            for file in pyb_files:
+                out_file = file.replace(".pyb", ".json")
+                replace_tokens_in_file(file, tokens, out_file=out_file, delete_after=True)
+
+            # restart service?
+            subprocess.run("sudo systemctl start {0}".format(project_name), shell=True)
+
             pass
 
 
