@@ -35,7 +35,7 @@ def deploy(options):
     zipfile_name = os.path.basename(options.deploy_file)
     project_name = zipfile_name.split(".")[0]  # TODO: only allow one dot for now
 
-    staging_dir = project_name + "_pkg"
+    staging_dir = os.path.join(os.getcwd(), project_name + "_pkg")
     os.makedirs(staging_dir)
 
     # Extract the zip file
@@ -55,7 +55,10 @@ def deploy(options):
     # Run through each of the projects in the zip
     #   Have a config file or just use folder names?
 
-    for directory in get_directories_in_directory(staging_dir):
+    directories = get_directories_in_directory(staging_dir)
+    print("Deploy: Parsing directories {0}".format(directories))
+
+    for directory in directories:
         if directory == "database":
             print("Deploy: Starting deploying database.")
 
