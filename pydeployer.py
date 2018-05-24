@@ -27,13 +27,9 @@ def build(options):
         builder.build()
 
 
-def load_tokens(tokens_file):
-    return load_config(tokens_file)
-
-
 def deploy(options):
     # Load in tokens from a file for now, before our token service is built out
-    tokens = load_tokens(options.tokens_file)
+    tokens = load_config(options.tokens_file)
 
     zipfile_name = os.path.basename(options.deploy_file)
     project_name = zipfile_name.split(".")[0].decode("utf-8")  # TODO: only allow one dot for now
@@ -43,6 +39,12 @@ def deploy(options):
 
     # Extract the zip file
     extract_zipfile(staging_dir, options.deploy_file)
+
+    # Populate build tokens in tokens file if they exist
+    build_tokens_file = os.path.join(staging_dir, "build_tokens.json")
+    if os.path.isfile(build_tokens_file):
+        build_tokens = load_config(build_tokens_file)
+        tokens.update(build_tokens)
 
     # Run through each of the projects in the zip
     #   Have a config file or just use folder names?
@@ -97,7 +99,6 @@ def create_database_config(tokens, scripts_directory):
     return config
 
 
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("command", nargs="?", default="build",
@@ -121,7 +122,7 @@ if __name__ == "__main__":
         if not args.deploy_file:
             print("Deploy file is required.")
         else:
-            deploy()
+            deploy(args)
     else:
         print("Unknown command: " + args.command)
 
