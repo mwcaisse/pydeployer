@@ -11,7 +11,9 @@ class FlywayDatabaseDeployer:
 
         print("Deploy: Running 'flyway {0}'".format(self.translate_parameters(parameters)))
 
-        subprocess.run("flyway " + self.translate_parameters(parameters), shell=True)
+        subprocess.run("flyway {params} {command}".format(
+            params=self.translate_parameters(parameters),
+            command="migrate"), shell=True)
 
     @staticmethod
     def translate_parameters(parameters):
@@ -21,7 +23,7 @@ class FlywayDatabaseDeployer:
         params = self.create_default_parameters()
         params.update({
             "user": self.config["user"],
-            "password": "'{0}'".format(self.config["password"]),
+            "password": "{0}".format(self.config["password"]),
             "url": "jdbc:mariadb://{host}:{port}/{schema}".format(
                 host=self.config.get("host", "localhost"),
                 port=self.config.get("port", "3306"),
