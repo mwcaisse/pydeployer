@@ -94,7 +94,7 @@ def deploy(options):
 
             # populate token files
             print("Deploy: Inflating pyb files")
-            pyb_files = get_files_matching_pattern(publish_dir, "*.pyb")
+            pyb_files = get_files_matching_pattern(publish_dir, ".*\.pyb", relative=False)
             for file in pyb_files:
                 out_file = file.replace(".pyb", ".json")
                 replace_tokens_in_file(file, tokens, out_file=out_file, delete_after=True)
