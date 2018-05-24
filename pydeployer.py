@@ -29,6 +29,7 @@ def build(options):
 
 def deploy(options):
     # Load in tokens from a file for now, before our token service is built out
+    print("Deploy: Loading tokens file: {0}".format(options.tokens_file))
     tokens = load_config(options.tokens_file)
 
     zipfile_name = os.path.basename(options.deploy_file)
@@ -44,6 +45,7 @@ def deploy(options):
     ))
     extract_zipfile(options.deploy_file, staging_dir)
 
+
     # Populate build tokens in tokens file if they exist
     build_tokens_file = os.path.join(staging_dir, "build_tokens.json")
     if os.path.isfile(build_tokens_file):
@@ -55,6 +57,8 @@ def deploy(options):
 
     for directory in get_directories_in_directory(staging_dir):
         if directory == "database":
+            print("Deploy: Starting deploying database.")
+
             config_file = os.path.join(staging_dir, directory, "config.json")
             project_config = load_config(config_file)
             scripts_directory = os.path.join(staging_dir, directory, project_config.pop("scriptDirectory", "scripts"))
@@ -64,28 +68,36 @@ def deploy(options):
             # TODO: Do some sort of error handling? Otherwise we have no idea if database deploy was successful or not
             deployer.deploy()
 
+            print("Deploy: Ended deploying database.")
+
         elif directory == "web":
 
             # lets check if output-path/project-name/publish exists
             publish_dir = os.path.join(options.output_path, project_name, "publish")
             os.makedirs(publish_dir)
+            print("Deploy: Made publish directory: {0}".format(publish_dir))
 
             # end service?
+            print("Deploy: Stopping service...")
             subprocess.run("sudo systemctl stop {0}".format(project_name), shell=True)
 
             # Clean out what is currently in publish dir
+            print("Deploy: Emptying publish directory {0}".format(publish_dir))
             empty_directory(publish_dir)
 
+            print("Deploy: Copying files to publish dir from {0}".format(os.path.join(staging_dir, project_name)))
             # Copy project to publish dir
             shutil.copytree(os.path.join(staging_dir, project_name), publish_dir)
 
             # populate token files
+            print("Deploy: Inflating pyb files")
             pyb_files = get_files_matching_pattern(publish_dir, "*.pyb")
             for file in pyb_files:
                 out_file = file.replace(".pyb", ".json")
                 replace_tokens_in_file(file, tokens, out_file=out_file, delete_after=True)
 
             # restart service?
+            print("Deploy: Starting service...")
             subprocess.run("sudo systemctl start {0}".format(project_name), shell=True)
 
             pass
