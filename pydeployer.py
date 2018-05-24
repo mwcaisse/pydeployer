@@ -113,7 +113,7 @@ def create_database_config(tokens, scripts_directory):
         "host": tokens["database_host"],
         "port": tokens["database_port"],
         "schema": tokens["database_schema"],
-        "scripts_directory": tokens["scripts_directory"]
+        "scripts_directory": scripts_directory
     }
     return config
 
