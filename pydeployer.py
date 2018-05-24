@@ -3,6 +3,7 @@ import json
 import os
 
 from builder import Builder
+from database_deployer import FlywayDatabaseDeployer
 from util import extract_zipfile, get_directories_in_directory
 
 
@@ -22,9 +23,17 @@ def build(options):
         builder = Builder(config)
         builder.build()
 
+
+def load_tokens(tokens_file):
+    return load_config(tokens_file)
+
+
 def deploy(options):
+    # Load in tokens from a file for now, before our token service is built out
+    tokens = load_tokens(options.tokens_file)
+
     zipfile_name = os.path.basename(options.deploy_file)
-    project_name = zipfile_name.split(".")[0] # only allow one dot for now
+    project_name = zipfile_name.split(".")[0].decode("utf-8")  # TODO: only allow one dot for now
 
     staging_dir = project_name + "_pkg"
     os.makedirs(staging_dir)
@@ -36,12 +45,17 @@ def deploy(options):
     #   Have a config file or just use folder names?
 
     for directory in get_directories_in_directory(staging_dir):
-        if directory == "Database":
+        if directory == "database":
             config_file = os.path.join(staging_dir, directory, "config.json")
-            config = load_config(config_file)
-            # load config.json to get config file
+            project_config = load_config(config_file)
+            scripts_directory = os.path.join(staging_dir, directory, project_config.pop("scriptDirectory", "scripts"))
+            config = create_database_config(tokens, scripts_directory)
 
-        elif directory == "Web":
+            deployer = FlywayDatabaseDeployer(config)
+            # TODO: Do some sort of error handling? Otherwise we have no idea if database deploy was successful or not
+            deployer.deploy()
+
+        elif directory == "web":
             pass
 
 
@@ -60,14 +74,18 @@ def create_database_config(tokens, scripts_directory):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("command", nargs="?", default="build", help="Command to execute: build, deploy. default: build")
-    parser.add_argument("deploy_file", nargs="?", default=None, help="File to deploy. Required if deploy is specified as command")
+    parser.add_argument("command", nargs="?", default="build",
+                        help="Command to execute: build, deploy. default: build")
+    parser.add_argument("deploy_file", nargs="?", default=None,
+                        help="File to deploy. Required if deploy is specified as command")
 
     parser.add_argument("-c", "--config-file", dest="config_file", default="config.json",
                         help="Location of the project's config file. default: config.json")
 
     parser.add_argument("-o", "--output-path", dest="output_path", default="/opt/apps/")
     parser.add_argument("-p", "--project-directory", dest="project_directory", default=None)
+    parser.add_argument("-t", "--tokens-file", dest="tokens_file", default=None,
+                        help="Path to the file containing the deployment tokens")
 
     args = parser.parse_args()
 

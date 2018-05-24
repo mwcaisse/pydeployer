@@ -6,7 +6,7 @@ class FlywayDatabaseDeployer:
     def __init__(self, config):
         self.config = config
 
-    def migrate(self):
+    def deploy(self):
         parameters = self.create_flyway_parameters()
 
         subprocess.run("flyway", self.translate_parameters(parameters))
@@ -29,6 +29,9 @@ class FlywayDatabaseDeployer:
                 scriptsDirectory=self.config["scripts_directory"]
             )
         })
+
+        self.copy_config_entry(params, self.config, "versionPrefix", "V")
+        self.copy_config_entry(params, self.config, "versionSeparator", "_")
         return params
 
     @staticmethod
@@ -45,3 +48,10 @@ class FlywayDatabaseDeployer:
             "password": ""
         }
 
+    @staticmethod
+    # TODO MOve this to a config utils file at some point?
+    def copy_config_entry(dest, source, key, default=None):
+        if key in source:
+            dest[key] = source[key]
+        elif default:
+            dest[key] = default
