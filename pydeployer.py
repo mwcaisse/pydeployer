@@ -32,7 +32,7 @@ def deploy(options):
     tokens = load_config(options.tokens_file)
 
     zipfile_name = os.path.basename(options.deploy_file)
-    project_name = zipfile_name.split(".")[0].decode("utf-8")  # TODO: only allow one dot for now
+    project_name = zipfile_name.split(".")[0]  # TODO: only allow one dot for now
 
     staging_dir = project_name + "_pkg"
     os.makedirs(staging_dir)
