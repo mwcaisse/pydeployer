@@ -35,7 +35,7 @@ class WebDeployer:
 
         # copy from the staging directory into the publish directory
         print("WebDeploy: Copying files to publish directory")
-        empty_directory(publish_directory)
+        shutil.rmtree(publish_directory)
         shutil.copytree(staging_directory, publish_directory)
 
         # perform the tokenizer filling, if it throws an error, let it raise up..
