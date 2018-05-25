@@ -13,6 +13,10 @@ def replace_tokens_in_file(in_file, tokens, out_file=None, delete_after=False):
 
     content_replaced = replace_tokens_in_string(content, tokens)
 
+    # if the outfile exists, replace it
+    if os.path.isfile(out_file):
+        os.remove(out_file)
+
     with open(out_file, "w") as file:
         file.write(content_replaced)
 
