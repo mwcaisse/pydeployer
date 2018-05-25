@@ -5,7 +5,7 @@ import os
 from builder import Builder
 from database_deployer import FlywayDatabaseDeployer
 from web_deployer import WebDeployer
-from util import extract_zipfile, get_directories_in_directory, empty_directory, get_files_matching_pattern
+from util import extract_zipfile, get_directories_in_directory
 
 
 def load_config(config_file):
