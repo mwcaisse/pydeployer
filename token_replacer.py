@@ -2,7 +2,7 @@ import os
 import re
 
 
-TOKEN_REGEX = re.compile(r"\[\[.+\]\]")
+TOKEN_REGEX = re.compile(r"\[\[.+?\]\]")
 
 
 def replace_tokens_in_file(in_file, tokens, out_file=None, delete_after=False):
