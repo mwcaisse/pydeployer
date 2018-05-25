@@ -9,8 +9,6 @@ class FlywayDatabaseDeployer:
     def deploy(self):
         parameters = self.create_flyway_parameters()
 
-        print("Deploy: Running 'flyway {0}'".format(self.translate_parameters(parameters)))
-
         subprocess.run("flyway {params} {command}".format(
             params=self.translate_parameters(parameters),
             command="migrate"), shell=True)
