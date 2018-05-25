@@ -52,16 +52,4 @@ def get_directories_in_directory(directory, relative=True):
     return directories
 
 
-def get_files_matching_pattern(directory, pattern, relative=True):
-    files = []
 
-    pattern = re.compile(pattern)
-    for file_name in os.listdir(directory):
-        full_path = os.path.join(directory, file_name)
-        if os.path.isfile(full_path) and pattern.match(file_name):
-            if relative:
-                files.append(file_name)
-            else:
-                files.append(full_path)
-
-    return files

@@ -1,5 +1,6 @@
 import os
 import shutil
+import subprocess
 
 from token_replacer import replace_tokens_in_file
 from util import get_all_file_paths, empty_directory
@@ -10,28 +11,40 @@ class WebDeployer:
     def __init__(self, config):
         self.config = config
 
-    def deploy(self, staging_directory, deploy_directory, tokens):
+    def deploy(self, staging_directory, deploy_directory, tokens, project_name):
         """
 
             - Apps directory
             - project name
             - Temp directory that contains the extracted package
             - tokens to translate the pyb files
+            - name of the project
 
         :return:
         """
 
-        # perform the tokenizer filling, if it throws an error, let it raise up..
-        self.translate_pyb_files(staging_directory)
+        # End the service before we start the deploy
+        print("WebDeploy: Stopping service...")
+        self.stop_service(project_name)
 
         # make sure the publish directory exists, if it doesn't create it
+        print("WebDeploy: Creating Publish directory")
         publish_directory = os.path.join(deploy_directory, "publish")
         if not os.path.exists(publish_directory):
             os.makedirs(publish_directory)
 
         # copy from the staging directory into the publish directory
+        print("WebDeploy: Copying files to publish directory")
         empty_directory(publish_directory)
         shutil.copytree(staging_directory, publish_directory)
+
+        # perform the tokenizer filling, if it throws an error, let it raise up..
+        print("WebDeploy: Translating pyb files")
+        self.translate_pyb_files(publish_directory, tokens)
+
+        # Restart the service when we are done with deploy
+        print("WebDeploy: Starting service...")
+        self.start_service(project_name)
 
     def translate_pyb_files(self, staging_directory, tokens):
         pyb_files = get_all_file_paths(staging_directory, lambda filename: filename.endswith(".pyb"))
@@ -40,3 +53,8 @@ class WebDeployer:
 
             replace_tokens_in_file(file, tokens, out_file=out_file, delete_after=True)
 
+    def start_service(self, name):
+        subprocess.run("sudo systemctl start {0}".format(name), shell=True)
+
+    def stop_service(self, name):
+        subprocess.run("sudo systemctl stop {0}".format(name), shell=True)

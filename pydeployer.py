@@ -1,12 +1,10 @@
 import argparse
 import json
 import os
-import shutil
-import subprocess
 
 from builder import Builder
 from database_deployer import FlywayDatabaseDeployer
-from token_replacer import replace_tokens_in_file
+from web_deployer import WebDeployer
 from util import extract_zipfile, get_directories_in_directory, empty_directory, get_files_matching_pattern
 
 
@@ -74,36 +72,13 @@ def deploy(options):
             print("Deploy: Ended deploying database.")
 
         elif directory == "web":
+            staging_dir = os.path.join(staging_dir, project_name)
+            deploy_dir = os.path.join(options.output_path, project_name)
 
-            # lets check if output-path/project-name/publish exists
-            publish_dir = os.path.join(options.output_path, project_name, "publish")
-            os.makedirs(publish_dir)
-            print("Deploy: Made publish directory: {0}".format(publish_dir))
+            deployer = WebDeployer(dict())
+            deployer.deploy(staging_dir, deploy_dir, tokens, project_name)
 
-            # end service?
-            print("Deploy: Stopping service...")
-            subprocess.run("sudo systemctl stop {0}".format(project_name), shell=True)
 
-            # Clean out what is currently in publish dir
-            print("Deploy: Emptying publish directory {0}".format(publish_dir))
-            empty_directory(publish_dir)
-
-            print("Deploy: Copying files to publish dir from {0}".format(os.path.join(staging_dir, project_name)))
-            # Copy project to publish dir
-            shutil.copytree(os.path.join(staging_dir, project_name), publish_dir)
-
-            # populate token files
-            print("Deploy: Inflating pyb files")
-            pyb_files = get_files_matching_pattern(publish_dir, ".*\.pyb", relative=False)
-            for file in pyb_files:
-                out_file = file.replace(".pyb", ".json")
-                replace_tokens_in_file(file, tokens, out_file=out_file, delete_after=True)
-
-            # restart service?
-            print("Deploy: Starting service...")
-            subprocess.run("sudo systemctl start {0}".format(project_name), shell=True)
-
-            pass
 
 
 def create_database_config(tokens, scripts_directory):
