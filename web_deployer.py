@@ -22,8 +22,6 @@ class WebDeployer:
 
         :return:
         """
-
-        project_name = project_name.lower()
         
         # End the service before we start the deploy
         print("WebDeploy: Stopping service...")
