@@ -72,7 +72,7 @@ def deploy(options):
             print("Deploy: Ended deploying database.")
 
         elif directory == "web":
-            staging_dir = os.path.join(staging_dir, project_name)
+            staging_dir = os.path.join(staging_dir, directory)
             deploy_dir = os.path.join(options.output_path, project_name)
 
             deployer = WebDeployer(dict())
