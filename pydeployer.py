@@ -5,17 +5,8 @@ import os
 from builder import Builder
 from database_deployer import FlywayDatabaseDeployer
 from web_deployer import WebDeployer
-from util import extract_zipfile, get_directories_in_directory
+from util import extract_zipfile, get_directories_in_directory, load_config
 
-
-def load_config(config_file):
-    if not os.path.isfile(config_file):
-        print("Could not load config file: {0}.".format(config_file))
-        return None
-    with open(config_file) as config_file:
-        config = json.load(config_file)
-
-    return config
 
 
 def build(options):
@@ -77,8 +68,6 @@ def deploy(options):
 
             deployer = WebDeployer(dict())
             deployer.deploy(staging_dir, deploy_dir, tokens, project_name)
-
-
 
 
 def create_database_config(tokens, scripts_directory):

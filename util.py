@@ -4,6 +4,15 @@ import shutil
 from zipfile import ZipFile
 
 
+def load_config(config_file):
+    if not os.path.isfile(config_file):
+        print("Could not load config file: {0}.".format(config_file))
+        return None
+    with open(config_file) as config_file:
+        config = json.load(config_file)
+
+    return config
+
 def get_all_file_paths(directory, condition=None):
     file_paths = []
 
