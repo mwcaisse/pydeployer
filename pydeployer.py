@@ -109,8 +109,6 @@ if __name__ == "__main__":
     elif args.command == "deploy":
         if not args.deploy_file:
             print("Deploy file is required.")
-        elif not args.application_uuid:
-            print("Application UUID is required")
         else:
             deploy(args)
     else:
