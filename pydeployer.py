@@ -8,7 +8,6 @@ from web_deployer import WebDeployer
 from util import extract_zipfile, get_directories_in_directory, load_config
 
 
-
 def build(options):
     config = load_config(options.project_config)
     if config:
@@ -17,6 +16,7 @@ def build(options):
 
 
 def deploy(options):
+    config = load_config(options.config_file)
     tokens = TokenFetcher(config).fetch_tokes(options.application_uuid)
 
     zipfile_name = os.path.basename(options.deploy_file)
