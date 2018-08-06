@@ -33,9 +33,9 @@ class TokenFetcher:
             "authenticationToken": self.config["service_token"]
         })
         resp.raise_for_status()
-        if bool(resp.text):
+        if (resp.text or "").lower() == "true":
             return resp.headers[self.AUTH_TOKEN_HEADER]
-        return None
+        raise PermissionError("Unable to log in to token service.")
 
     def construct_url(self, relative_url):
         api_url = self.config["service_url"]
