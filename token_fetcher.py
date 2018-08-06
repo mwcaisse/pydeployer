@@ -38,7 +38,7 @@ class TokenFetcher:
         return None
 
     def construct_url(self, relative_url):
-        api_url = self.config["api_url"]
+        api_url = self.config["service_url"]
         if not api_url.endswith("/"):
             api_url = api_url + "/"
         return api_url + relative_url

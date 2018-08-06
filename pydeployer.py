@@ -1,25 +1,24 @@
 import argparse
-import json
 import os
 
 from builder import Builder
 from database_deployer import FlywayDatabaseDeployer
+from token_fetcher import TokenFetcher
 from web_deployer import WebDeployer
 from util import extract_zipfile, get_directories_in_directory, load_config
 
 
 
 def build(options):
-    config = load_config(options.config_file)
+    config = load_config(options.project_config)
     if config:
         builder = Builder(config)
         builder.build()
 
 
 def deploy(options):
-    # Load in tokens from a file for now, before our token service is built out
-    print("Deploy: Loading tokens file: {0}".format(options.tokens_file))
-    tokens = load_config(options.tokens_file)
+    config = load_config(options.config_file)
+    tokens = TokenFetcher(config).fetch_tokes(options.application_uuid)
 
     zipfile_name = os.path.basename(options.deploy_file)
     project_name = zipfile_name.split(".")[0].lower()  # TODO: only allow one dot for now
@@ -89,9 +88,14 @@ if __name__ == "__main__":
     parser.add_argument("deploy_file", nargs="?", default=None,
                         help="File to deploy. Required if deploy is specified as command")
 
-    parser.add_argument("-c", "--config-file", dest="config_file", default="config.json",
+    parser.add_argument("-c", "--config-file", dest="config_file", default="/opt/pydeployer/config.json",
+                        help="Location of the pydeployer configuration file")
+    parser.add_argument("-p", "--project-config", dest="project_config", default="config.json",
                         help="Location of the project's config file. default: config.json")
-
+    #TODO: Should probably move this to the package that is being deployed.
+    parser.add_argument("-a", "--application-uuid", dest="application_uuid", default=None,
+                        help="The UUID of the application that is being deployed")
+    parser.add_argument("-o", "--output-path", dest="output_path", default="/opt/apps/")
     parser.add_argument("-o", "--output-path", dest="output_path", default="/opt/apps/")
     parser.add_argument("-p", "--project-directory", dest="project_directory", default=None)
     parser.add_argument("-t", "--tokens-file", dest="tokens_file", default=None,
@@ -104,6 +108,8 @@ if __name__ == "__main__":
     elif args.command == "deploy":
         if not args.deploy_file:
             print("Deploy file is required.")
+        elif not args.application_uuid:
+            print("Application UUID is required")
         else:
             deploy(args)
     else:
