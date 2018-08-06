@@ -10,7 +10,7 @@ from util import extract_zipfile, get_directories_in_directory, load_config
 
 def build(options):
     config = load_config(options.project_config)
-    config["build_number "] = options.build_number
+    config["build_number"] = options.build_number
     if config:
         builder = Builder(config)
         builder.build()
