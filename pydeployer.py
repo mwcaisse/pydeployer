@@ -16,8 +16,8 @@ def build(options):
 
 
 def deploy(options):
+    #Load the pydeployer config
     config = load_config(options.config_file)
-    tokens = TokenFetcher(config).fetch_tokes(options.application_uuid)
 
     zipfile_name = os.path.basename(options.deploy_file)
     project_name = zipfile_name.split(".")[0].lower()  # TODO: only allow one dot for now
@@ -32,6 +32,13 @@ def deploy(options):
     ))
     extract_zipfile(options.deploy_file, staging_dir)
 
+    # Load up the metadata file
+    metadata_file = os.path.join(staging_dir, "metadata.json")
+    if os.path.isfile(metadata_file):
+        metadata = load_config(metadata_file)
+
+    #Fetch the tokens
+    tokens = TokenFetcher(config).fetch_tokes(metadata["uuid"])
 
     # Populate build tokens in tokens file if they exist
     build_tokens_file = os.path.join(staging_dir, "build_tokens.json")
@@ -91,9 +98,6 @@ if __name__ == "__main__":
                         help="Location of the pydeployer configuration file")
     parser.add_argument("-p", "--project-config", dest="project_config", default="config.json",
                         help="Location of the project's config file. default: config.json")
-    #TODO: Should probably move this to the package that is being deployed.
-    parser.add_argument("-a", "--application-uuid", dest="application_uuid", default=None,
-                        help="The UUID of the application that is being deployed")
     parser.add_argument("-d", "--project-directory", dest="project_directory", default=None)
     parser.add_argument("-t", "--tokens-file", dest="tokens_file", default=None,
                         help="Path to the file containing the deployment tokens")

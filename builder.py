@@ -46,6 +46,7 @@ class Builder:
                     json.dump(database_config, database_config_file)
 
         self.create_build_tokens(build_directory)
+        self.create_metadata(build_directory)
         self.package(build_directory)
 
     def package(self, build_directory):
@@ -69,6 +70,14 @@ class Builder:
 
         with open(os.path.join(directory, "build_tokens.json"), "w") as tokens_file:
             json.dump(tokens, tokens_file)
+
+    def create_metadata(self, directory):
+        metadata = {
+            "uuid": self.config["uuid"]
+        }
+
+        with open(os.path.join(directory, "metadata.json"), "w") as metadata_file:
+            json.dump(metadata, metadata_file)
 
 
 
