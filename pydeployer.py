@@ -17,7 +17,6 @@ def build(options):
 
 
 def deploy(options):
-    config = load_config(options.config_file)
     tokens = TokenFetcher(config).fetch_tokes(options.application_uuid)
 
     zipfile_name = os.path.basename(options.deploy_file)
@@ -63,7 +62,7 @@ def deploy(options):
 
         elif directory == "web":
             staging_dir = os.path.join(staging_dir, directory)
-            deploy_dir = os.path.join(options.output_path, project_name)
+            deploy_dir = os.path.join(config["output_path"], project_name)
 
             deployer = WebDeployer(dict())
             deployer.deploy(staging_dir, deploy_dir, tokens, project_name)
@@ -95,7 +94,6 @@ if __name__ == "__main__":
     #TODO: Should probably move this to the package that is being deployed.
     parser.add_argument("-a", "--application-uuid", dest="application_uuid", default=None,
                         help="The UUID of the application that is being deployed")
-    parser.add_argument("-o", "--output-path", dest="output_path", default="/opt/apps/")
     parser.add_argument("-d", "--project-directory", dest="project_directory", default=None)
     parser.add_argument("-t", "--tokens-file", dest="tokens_file", default=None,
                         help="Path to the file containing the deployment tokens")
