@@ -10,6 +10,7 @@ from util import extract_zipfile, get_directories_in_directory, load_config
 
 def build(options):
     config = load_config(options.project_config)
+    config["build_number "] = options.build_number
     if config:
         builder = Builder(config)
         builder.build()
@@ -93,7 +94,7 @@ if __name__ == "__main__":
                         help="Command to execute: build, deploy. default: build")
     parser.add_argument("deploy_file", nargs="?", default=None,
                         help="File to deploy. Required if deploy is specified as command")
-
+    parser.add_argument("-b", "--build-number", dest="build_number", default="0")
     parser.add_argument("-c", "--config-file", dest="config_file", default="/opt/pydeployer/config.json",
                         help="Location of the pydeployer configuration file")
     parser.add_argument("-p", "--project-config", dest="project_config", default="config.json",

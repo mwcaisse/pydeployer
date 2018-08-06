@@ -65,7 +65,7 @@ class Builder:
             "build_git_short_hash": self.run_git_command("rev-parse --short HEAD"),
             "build_git_long_hash": self.run_git_command("rev-parse HEAD"),
             "build_git_branch": "master",  # hard coding for life
-            "build_number": 0,
+            "build_number": self.config["build_number"],
         }
 
         with open(os.path.join(directory, "build_tokens.json"), "w") as tokens_file:
