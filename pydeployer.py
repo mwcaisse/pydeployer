@@ -96,7 +96,7 @@ if __name__ == "__main__":
     parser.add_argument("-a", "--application-uuid", dest="application_uuid", default=None,
                         help="The UUID of the application that is being deployed")
     parser.add_argument("-o", "--output-path", dest="output_path", default="/opt/apps/")
-    parser.add_argument("-p", "--project-directory", dest="project_directory", default=None)
+    parser.add_argument("-d", "--project-directory", dest="project_directory", default=None)
     parser.add_argument("-t", "--tokens-file", dest="tokens_file", default=None,
                         help="Path to the file containing the deployment tokens")
 
