@@ -52,9 +52,9 @@ def deploy(options):
             config_file = os.path.join(staging_dir, directory, "config.json")
             project_config = load_config(config_file)
             scripts_directory = os.path.join(staging_dir, directory, project_config.pop("scriptDirectory", "scripts"))
-            config = create_database_config(tokens, scripts_directory)
+            db_config = create_database_config(tokens, scripts_directory)
 
-            deployer = FlywayDatabaseDeployer(config)
+            deployer = FlywayDatabaseDeployer(db_config)
             # TODO: Do some sort of error handling? Otherwise we have no idea if database deploy was successful or not
             deployer.deploy()
 
