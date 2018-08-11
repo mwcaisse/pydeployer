@@ -12,14 +12,23 @@ depends=('python>=3.7.0' 'python-requests>=2.19.1'
 source=("$pkgname-$pkgver.tar.gz::https://github.com/mwcaisse/pydeployer/archive/master.tar.gz")
 md5sums=('SKIP')
 
+backup=("opt/$pkgname/conf/config.json")
+
 package() {
 
+    # Copy the script files
     cd "$pkgname-master"
     mkdir -p "$pkgdir/opt/$pkgname/"
     cp -r *.py "$pkgdir/opt/$pkgname/"
 
+    # Create the conf dir and copy over the sample config
+    mkdir -p "$pkgdir/opt/$pkgname/conf"
+    cp sample_config.json "$pkgdir/opt/$pkgname/conf/config.json"
+
+    # Mark the script as executable
     chmod a+x "$pkgdir/opt/$pkgname/pydeployer.py"
 
+    # Create the binary symlink
     mkdir -p "$pkgdir/usr/bin"
     ln -s "/opt/$pkgname/pydeployer.py" "$pkgdir/usr/bin/$pkgname"
 }
