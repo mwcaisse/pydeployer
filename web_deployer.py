@@ -66,7 +66,7 @@ class WebDeployer:
         cont = True
         if "module_name" not in metadata:
             print("Unable to create run script. No module_name defined.")
-            cont=False
+            cont = False
 
         if "web_port" not in project_tokens:
             print("Unable to create run script. No web port defined.")
@@ -78,7 +78,7 @@ class WebDeployer:
         tokens = {
             "port": project_tokens["web_port"],
             "publish_dir": publish_directory,
-            "module_Name": metadata["module_name"]
+            "module_name": metadata["module_name"]
         }
         template_file = self.get_template_file("run.sh.pyb")
         run_file = os.path.join(staging_directory, "run.sh")
