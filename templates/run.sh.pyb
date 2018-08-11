@@ -4,4 +4,4 @@
 export ASPNETCORE_URLS="http://localhost:[[port]]"
 
 cd [[publish_dir]]
-dotnet [[module_name]]dll
+dotnet [[module_name]].dll
