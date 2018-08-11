@@ -45,7 +45,7 @@ class WebDeployer:
         # Create the service file
         if not run_file_path:
             print("Creating service file without run path defined.")
-        self.create_service_file(deploy_directory, project_metadata, publish_directory, run_file_path or "")
+        self.create_service_file(deploy_directory, publish_directory, project_name, run_file_path or "")
 
         # perform the tokenizer filling, if it throws an error, let it raise up..
         print("WebDeploy: Translating pyb files")
@@ -88,7 +88,7 @@ class WebDeployer:
 
         return run_file
 
-    def create_service_file(self, deploy_directory, project_name, publish_directory, run_script):
+    def create_service_file(self, deploy_directory, publish_directory, project_name, run_script):
         tokens = {
             "project_name": project_name.title(),
             "publish_dir": publish_directory,
