@@ -77,7 +77,7 @@ def deploy(options):
             deploy_dir = os.path.join(config["output_path"], project_name)
 
             deployer = WebDeployer(dict())
-            deployer.deploy(staging_dir, deploy_dir, tokens, project_name)
+            deployer.deploy(staging_dir, deploy_dir, tokens, project_name, metadata.get("web", {}))
 
 
 def create_database_config(tokens, scripts_directory):

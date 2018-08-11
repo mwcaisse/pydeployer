@@ -11,7 +11,7 @@ class WebDeployer:
     def __init__(self, config):
         self.config = config
 
-    def deploy(self, staging_directory, deploy_directory, tokens, project_name):
+    def deploy(self, staging_directory, deploy_directory, tokens, project_name, project_metadata):
         """
 
             - Apps directory
@@ -38,6 +38,17 @@ class WebDeployer:
         shutil.rmtree(publish_directory)
         shutil.copytree(staging_directory, publish_directory)
 
+        # create the run script
+        if "module_name" not in project_metadata:
+            raise Exception("Unable to create run script. No module_name defined.")
+        if "web_port" not in tokens:
+            raise Exception("Unable to create run script. No web port defined.")
+        run_file_path = self.create_run_script(staging_directory, publish_directory,
+                                               project_metadata.get("module_name"))
+
+        # Create the service file
+        self.create_service_file(deploy_directory, project_metadata, publish_directory, run_file_path)
+
         # perform the tokenizer filling, if it throws an error, let it raise up..
         print("WebDeploy: Translating pyb files")
         self.translate_pyb_files(publish_directory, tokens)
@@ -52,6 +63,34 @@ class WebDeployer:
             out_file = file.replace(".pyb", ".json")
 
             replace_tokens_in_file(file, tokens, out_file=out_file, delete_after=True)
+
+    def create_run_script(self, staging_directory, publish_directory, module_name, port):
+        tokens = {
+            "port": port,
+            "publish_dir": publish_directory,
+            "module_Name": module_name
+        }
+        template_file = self.get_template_file("run.sh.pyb")
+        run_file = os.path.join(staging_directory, "run.sh")
+        replace_tokens_in_file(template_file, tokens, out_file=run_file, delete_after=False)
+
+        subprocess.run("chmod a+x {0}".format(run_file), shell=True)
+
+        return run_file
+
+    def create_service_file(self, deploy_directory, project_name, publish_directory, run_script):
+        tokens = {
+            "project_name": project_name.title(),
+            "publish_dir": publish_directory,
+            "run_script": run_script
+        }
+        template_file = self.get_template_file("service.pyb")
+
+        out_file = os.path.join(deploy_directory, "{0}.service".format(project_name))
+        replace_tokens_in_file(template_file, tokens, out_file=out_file, delete_after=False)
+
+    def get_template_file(self, name):
+        return os.path.join(os.path.abspath(os.path.dirname(__file__)), "templates/{name}".format(name=name))
 
     def start_service(self, name):
         subprocess.run("sudo systemctl start {0}".format(name), shell=True)

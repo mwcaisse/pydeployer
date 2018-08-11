@@ -20,6 +20,10 @@ package() {
     mkdir -p "$pkgdir/opt/$pkgname/"
     cp -r *.py "$pkgdir/opt/$pkgname/"
 
+    # Copy the template files
+    mkdir -p "$pkgdir/opt/$pkgname/templates/"
+    cp -r ./templates/* "$pkgdir/opt/$pkgname/templates/"
+
     # Create the conf dir and copy over the sample config
     mkdir -p "$pkgdir/opt/$pkgname/conf"
     cp sample_config.yaml "$pkgdir/opt/$pkgname/conf/config.yaml"

@@ -1,0 +1,13 @@
+
+[Unit]
+Description=[[project_name]] Service
+
+[Service]
+WorkingDirectory=[[publish_dir]]
+ExecStart=[[run_script]]
+Restart=always
+RestartSec=10
+User=http
+
+[Install]
+WantedBy=multi-user.target

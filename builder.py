@@ -25,6 +25,11 @@ class Builder:
 
         subprocess.run("dotnet restore", shell=True, cwd=root_directory)
 
+        #meta data for the build
+        metadata = {
+            "uuid": self.config["uuid"]
+        }
+
         # Perform any project specific build steps
         for project in self.config["subProjects"]:
             if project.get("type") == "web":
@@ -36,6 +41,10 @@ class Builder:
                                .format(os.path.join(build_directory, "web")), shell=True,
                                cwd=os.path.join(root_directory, project["name"]))
 
+                metadata["web"] = {
+                    "module_name": project.get("module_name", project.get("name"))
+                }
+
             elif project.get("type") == "database":
                 script_directory = os.path.join(root_directory, project.get("name"), project.get("scriptDirectory"))
                 shutil.copytree(script_directory, os.path.join(build_directory, "database", "scripts"))
@@ -46,7 +55,7 @@ class Builder:
                     json.dump(database_config, database_config_file)
 
         self.create_build_tokens(build_directory)
-        self.create_metadata(build_directory)
+        self.save_metadata(build_directory, metadata)
         self.package(build_directory)
 
     def package(self, build_directory):
@@ -71,11 +80,7 @@ class Builder:
         with open(os.path.join(directory, "build_tokens.json"), "w") as tokens_file:
             json.dump(tokens, tokens_file)
 
-    def create_metadata(self, directory):
-        metadata = {
-            "uuid": self.config["uuid"]
-        }
-
+    def save_metadata(self, directory, metadata):
         with open(os.path.join(directory, "metadata.json"), "w") as metadata_file:
             json.dump(metadata, metadata_file)
 
