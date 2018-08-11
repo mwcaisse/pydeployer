@@ -7,7 +7,7 @@ from builder import Builder
 from database_deployer import FlywayDatabaseDeployer
 from token_fetcher import TokenFetcher
 from web_deployer import WebDeployer
-from util import extract_zipfile, get_directories_in_directory, load_config
+from util import extract_zipfile, get_directories_in_directory, load_config, load_yaml_config
 
 
 def build(options):
@@ -20,7 +20,7 @@ def build(options):
 
 def deploy(options):
     #Load the pydeployer config
-    config = load_config(options.config_file)
+    config = load_yaml_config(options.config_file)
 
     zipfile_name = os.path.basename(options.deploy_file)
     project_name = zipfile_name.split(".")[0].lower()  # TODO: only allow one dot for now
@@ -39,6 +39,8 @@ def deploy(options):
     metadata_file = os.path.join(staging_dir, "metadata.json")
     if os.path.isfile(metadata_file):
         metadata = load_config(metadata_file)
+    else:
+        raise Exception("Unable to load package metadata!")
 
     #Fetch the tokens
     tokens = TokenFetcher(config).fetch_tokes(metadata["uuid"])
@@ -97,7 +99,7 @@ if __name__ == "__main__":
     parser.add_argument("deploy_file", nargs="?", default=None,
                         help="File to deploy. Required if deploy is specified as command")
     parser.add_argument("-b", "--build-number", dest="build_number", default="0")
-    parser.add_argument("-c", "--config-file", dest="config_file", default="/opt/pydeployer/conf/config.json",
+    parser.add_argument("-c", "--config-file", dest="config_file", default="/opt/pydeployer/conf/config.yaml",
                         help="Location of the pydeployer configuration file")
     parser.add_argument("-p", "--project-config", dest="project_config", default="config.json",
                         help="Location of the project's config file. default: config.json")

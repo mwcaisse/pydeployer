@@ -1,9 +1,0 @@
-{
-	"tokens": {
-		"environment_uuid": "",
-		"service_url": "",
-		"service_username": "",
-		"service_token": ""
-	},
-	"output_path": "/srv/dotnet/"
-}
