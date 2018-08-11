@@ -39,7 +39,7 @@ class WebDeployer:
         shutil.copytree(staging_directory, publish_directory)
 
         # create the run script
-        run_file_path = self.create_run_script(staging_directory, publish_directory,
+        run_file_path = self.create_run_script(deploy_directory, publish_directory,
                                                project_metadata, tokens)
 
         # Create the service file
@@ -62,7 +62,7 @@ class WebDeployer:
 
             replace_tokens_in_file(file, tokens, out_file=out_file, delete_after=True)
 
-    def create_run_script(self, staging_directory, publish_directory, metadata, project_tokens):
+    def create_run_script(self, deploy_directory, publish_directory, metadata, project_tokens):
         cont = True
         if "module_name" not in metadata:
             print("Unable to create run script. No module_name defined.")
@@ -81,7 +81,7 @@ class WebDeployer:
             "module_name": metadata["module_name"]
         }
         template_file = self.get_template_file("run.sh.pyb")
-        run_file = os.path.join(staging_directory, "run.sh")
+        run_file = os.path.join(deploy_directory, "run.sh")
         replace_tokens_in_file(template_file, tokens, out_file=run_file, delete_after=False)
 
         subprocess.run("chmod a+x {0}".format(run_file), shell=True)
