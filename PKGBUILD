@@ -9,18 +9,17 @@ depends=('python>=3.7.0' 'python-requests>=2.19.1'
 'python-urllib3>=1.23')
 
 
-source("$pkgname-$pkgver.tar.gz::https://github.com/mwcaisse/pydeployer/archive/master.tar.gz"
-
-build() { 
-    cd "$pkgname-$pkgver" 
-    mkdir -p "$pkgdir/opt/$pkgname/"
-    cp -r *.py "$pkgdir/opt/$pkgname/"
-}
+source=("$pkgname-$pkgver.tar.gz::https://github.com/mwcaisse/pydeployer/archive/master.tar.gz")
+md5sums=('SKIP')
 
 package() {
-    
-    chmod 755 "$pkgdir/opt/$pkgname/pydeployer.py"
 
-    mkdir -p "$pkdir/usr/bin"
+    cd "$pkgname-master"
+    mkdir -p "$pkgdir/opt/$pkgname/"
+    cp -r *.py "$pkgdir/opt/$pkgname/"
+
+    chmod a+x "$pkgdir/opt/$pkgname/pydeployer.py"
+
+    mkdir -p "$pkgdir/usr/bin"
     ln -s "/opt/$pkgname/pydeployer.py" "$pkgdir/usr/bin/$pkgname"
 }
