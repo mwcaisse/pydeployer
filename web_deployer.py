@@ -39,15 +39,13 @@ class WebDeployer:
         shutil.copytree(staging_directory, publish_directory)
 
         # create the run script
-        if "module_name" not in project_metadata:
-            raise Exception("Unable to create run script. No module_name defined.")
-        if "web_port" not in tokens:
-            raise Exception("Unable to create run script. No web port defined.")
         run_file_path = self.create_run_script(staging_directory, publish_directory,
-                                               project_metadata.get("module_name"))
+                                               project_metadata, tokens)
 
         # Create the service file
-        self.create_service_file(deploy_directory, project_metadata, publish_directory, run_file_path)
+        if not run_file_path:
+            print("Creating service file without run path defined.")
+        self.create_service_file(deploy_directory, project_metadata, publish_directory, run_file_path or "")
 
         # perform the tokenizer filling, if it throws an error, let it raise up..
         print("WebDeploy: Translating pyb files")
@@ -64,11 +62,23 @@ class WebDeployer:
 
             replace_tokens_in_file(file, tokens, out_file=out_file, delete_after=True)
 
-    def create_run_script(self, staging_directory, publish_directory, module_name, port):
+    def create_run_script(self, staging_directory, publish_directory, metadata, project_tokens):
+        cont = True
+        if "module_name" not in metadata:
+            print("Unable to create run script. No module_name defined.")
+            cont=False
+
+        if "web_port" not in project_tokens:
+            print("Unable to create run script. No web port defined.")
+            cont = False
+
+        if not cont:
+            return
+
         tokens = {
-            "port": port,
+            "port": project_tokens["web_port"],
             "publish_dir": publish_directory,
-            "module_Name": module_name
+            "module_Name": metadata["module_name"]
         }
         template_file = self.get_template_file("run.sh.pyb")
         run_file = os.path.join(staging_directory, "run.sh")
