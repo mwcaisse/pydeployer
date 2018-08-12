@@ -23,7 +23,7 @@ class WebDeployer:
         :return:
         """
 
-        service_name = project_metadata.get("service_name", project_name)
+        service_name = project_metadata.get("serviceName", project_name)
 
         # End the service before we start the deploy
         print("WebDeploy: Stopping service...")
@@ -66,8 +66,8 @@ class WebDeployer:
 
     def create_run_script(self, deploy_directory, publish_directory, metadata, project_tokens):
         cont = True
-        if "module_name" not in metadata:
-            print("Unable to create run script. No module_name defined.")
+        if "moduleName" not in metadata:
+            print("Unable to create run script. No moduleName defined.")
             cont = False
 
         if "web_port" not in project_tokens:
@@ -80,7 +80,7 @@ class WebDeployer:
         tokens = {
             "port": project_tokens["web_port"],
             "publish_dir": publish_directory,
-            "module_name": metadata["module_name"]
+            "module_name": metadata["moduleName"]
         }
         template_file = self.get_template_file("run.sh.pyb")
         run_file = os.path.join(deploy_directory, "run.sh")
