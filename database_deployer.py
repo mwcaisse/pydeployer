@@ -32,8 +32,8 @@ class FlywayDatabaseDeployer:
             )
         })
 
-        self.copy_config_entry(self.config, "versionPrefix", params, "sqlMigrationPrefix" "V")
-        self.copy_config_entry(self.config, "versionSeparator", params, "sqlMigrationSeparator" "V")
+        self.copy_config_entry(self.config, "versionPrefix", params, "sqlMigrationPrefix", "V")
+        self.copy_config_entry(self.config, "versionSeparator", params, "sqlMigrationSeparator", "_")
         return params
 
     @staticmethod
