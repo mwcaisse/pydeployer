@@ -49,10 +49,9 @@ class Builder:
                 script_directory = os.path.join(root_directory, project.get("name"), project.get("scriptDirectory"))
                 shutil.copytree(script_directory, os.path.join(build_directory, "database", "scripts"))
 
-                database_config = copy.deepcopy(project)
-                database_config["scriptDirectory"] = "scripts"
-                with open(os.path.join(build_directory, "database", "config.json"), "w") as database_config_file:
-                    json.dump(database_config, database_config_file)
+                database_metadata = copy.deepcopy(project)
+                database_metadata["scriptDirectory"] = "scripts"
+                metadata["database"] = database_metadata
 
         self.create_build_tokens(build_directory)
         self.save_metadata(build_directory, metadata)

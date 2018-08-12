@@ -7,7 +7,7 @@ from builder import Builder
 from database_deployer import FlywayDatabaseDeployer
 from token_fetcher import TokenFetcher
 from web_deployer import WebDeployer
-from util import extract_zipfile, get_directories_in_directory, load_config, load_yaml_config
+from util import extract_zipfile, get_directories_in_directory, load_json_file, load_config
 
 
 def build(options):
@@ -20,7 +20,7 @@ def build(options):
 
 def deploy(options):
     #Load the pydeployer config
-    config = load_yaml_config(options.config_file)
+    config = load_config(options.config_file)
 
     zipfile_name = os.path.basename(options.deploy_file)
     project_name = zipfile_name.split(".")[0].lower()  # TODO: only allow one dot for now
@@ -38,7 +38,7 @@ def deploy(options):
     # Load up the metadata file
     metadata_file = os.path.join(staging_dir, "metadata.json")
     if os.path.isfile(metadata_file):
-        metadata = load_config(metadata_file)
+        metadata = load_json_file(metadata_file)
     else:
         raise Exception("Unable to load package metadata!")
 
@@ -48,7 +48,7 @@ def deploy(options):
     # Populate build tokens in tokens file if they exist
     build_tokens_file = os.path.join(staging_dir, "build_tokens.json")
     if os.path.isfile(build_tokens_file):
-        build_tokens = load_config(build_tokens_file)
+        build_tokens = load_json_file(build_tokens_file)
         tokens.update(build_tokens)
 
     # Run through each of the projects in the zip
@@ -61,8 +61,7 @@ def deploy(options):
         if directory == "database":
             print("Deploy: Starting deploying database.")
 
-            config_file = os.path.join(staging_dir, directory, "config.json")
-            project_config = load_config(config_file)
+            project_config = metadata.get("database", {})
             scripts_directory = os.path.join(staging_dir, directory, project_config.pop("scriptDirectory", "scripts"))
             db_config = create_database_config(tokens, scripts_directory)
 

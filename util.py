@@ -5,7 +5,7 @@ import yaml
 from zipfile import ZipFile
 
 
-def load_config(config_file):
+def load_json_file(config_file):
     if not os.path.isfile(config_file):
         print("Could not load config file: {0}.".format(config_file))
         return None
@@ -14,7 +14,7 @@ def load_config(config_file):
 
     return config
 
-def load_yaml_config(config_file):
+def load_config(config_file):
     if not os.path.isfile(config_file):
         print("Could not load config file: {0}.".format(config_file))
         return None
