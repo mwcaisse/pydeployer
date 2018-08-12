@@ -22,10 +22,12 @@ class WebDeployer:
 
         :return:
         """
-        
+
+        service_name = project_metadata.get("service_name", project_name)
+
         # End the service before we start the deploy
         print("WebDeploy: Stopping service...")
-        self.stop_service(project_name)
+        self.stop_service(service_name)
 
         # make sure the publish directory exists, if it doesn't create it
         print("WebDeploy: Creating Publish directory")
@@ -45,7 +47,7 @@ class WebDeployer:
         # Create the service file
         if not run_file_path:
             print("Creating service file without run path defined.")
-        self.create_service_file(deploy_directory, publish_directory, project_name, run_file_path or "")
+        self.create_service_file(deploy_directory, publish_directory, service_name, run_file_path or "")
 
         # perform the tokenizer filling, if it throws an error, let it raise up..
         print("WebDeploy: Translating pyb files")
@@ -53,7 +55,7 @@ class WebDeployer:
 
         # Restart the service when we are done with deploy
         print("WebDeploy: Starting service...")
-        self.start_service(project_name)
+        self.start_service(service_name)
 
     def translate_pyb_files(self, staging_directory, tokens):
         pyb_files = get_all_file_paths(staging_directory, lambda filename: filename.endswith(".pyb"))
@@ -88,15 +90,15 @@ class WebDeployer:
 
         return run_file
 
-    def create_service_file(self, deploy_directory, publish_directory, project_name, run_script):
+    def create_service_file(self, deploy_directory, publish_directory, service_name, run_script):
         tokens = {
-            "project_name": project_name.title(),
+            "project_name": service_name.title(),
             "publish_dir": publish_directory,
             "run_script": run_script
         }
         template_file = self.get_template_file("service.pyb")
 
-        out_file = os.path.join(deploy_directory, "{0}.service".format(project_name))
+        out_file = os.path.join(deploy_directory, "{0}.service".format(service_name))
         replace_tokens_in_file(template_file, tokens, out_file=out_file, delete_after=False)
 
     def get_template_file(self, name):
