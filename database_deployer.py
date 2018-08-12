@@ -15,7 +15,7 @@ class FlywayDatabaseDeployer:
 
     @staticmethod
     def translate_parameters(parameters):
-        return " ".join(["-{key}={value}".format(key=key, value=value) for key, value in parameters.items()])
+        return " ".join(["-{key}='{value}'".format(key=key, value=value) for key, value in parameters.items()])
 
     def create_flyway_parameters(self):
         params = self.create_default_parameters()
