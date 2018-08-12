@@ -46,7 +46,8 @@ class Builder:
                                cwd=os.path.join(root_directory, project["name"]))
 
                 metadata["web"] = {
-                    "moduleName": project.get("moduleName", project.get("name"))
+                    "moduleName": project.get("moduleName", project.get("name")),
+                    "serviceName": project.get("serviceName", project.get("name"))
                 }
 
             elif project.get("type") == "database":
