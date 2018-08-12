@@ -100,8 +100,8 @@ if __name__ == "__main__":
     parser.add_argument("-b", "--build-number", dest="build_number", default="0")
     parser.add_argument("-c", "--config-file", dest="config_file", default="/opt/pydeployer/conf/config.yaml",
                         help="Location of the pydeployer configuration file")
-    parser.add_argument("-p", "--project-config", dest="project_config", default="config.json",
-                        help="Location of the project's config file. default: config.json")
+    parser.add_argument("-p", "--project-config", dest="project_config", default="config.yaml",
+                        help="Location of the project's config file. default: config.yaml")
     parser.add_argument("-d", "--project-directory", dest="project_directory", default=None)
     parser.add_argument("-t", "--tokens-file", dest="tokens_file", default=None,
                         help="Path to the file containing the deployment tokens")
