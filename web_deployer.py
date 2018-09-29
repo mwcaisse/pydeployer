@@ -60,7 +60,7 @@ class WebDeployer:
     def translate_pyb_files(self, staging_directory, tokens):
         pyb_files = get_all_file_paths(staging_directory, lambda filename: filename.endswith(".pyb"))
         for file in pyb_files:
-            out_file = file.replace(".pyb", ".json")
+            out_file = file.replace(".pyb", "")
 
             replace_tokens_in_file(file, tokens, out_file=out_file, delete_after=True)
 
