@@ -43,7 +43,12 @@ def deploy(options):
         raise Exception("Unable to load package metadata!")
 
     #Fetch the tokens
-    tokens = TokenFetcher(config).fetch_tokes(metadata["uuid"])
+    # if there was a token file specified as a parameter use the tokens from there
+    # otherwise use the token service
+    if getattr(options, "tokens_file", None):
+        tokens = load_json_file(options.tokens_file)
+    else:
+        tokens = TokenFetcher(config).fetch_tokes(metadata["uuid"])
 
     # Populate build tokens in tokens file if they exist
     build_tokens_file = os.path.join(staging_dir, "build_tokens.json")
