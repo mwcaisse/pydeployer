@@ -12,14 +12,21 @@ class TokenFetcher:
 
         self.config = config["tokens"]
 
-    def fetch_tokes(self, application_uuid):
+    def fetch_deploy_tokens(self, application_uuid):
         url = self.construct_url("application/{application_uuid}/environment/{environment_uuid}/token".format(
             application_uuid=application_uuid,
             environment_uuid=self.config["environment_uuid"]
         ))
+        return self.make_request(url)
+
+    def fetch_build_tokens(self):
+        url = self.construct_url("build/token/")
+        return self.make_request(url)
+
+    def make_token_request(self, url):
         auth_token = self.login_for_token()
         resp = requests.get(url, headers={
-            self.AUTH_TOKEN_HEADER:  auth_token
+            self.AUTH_TOKEN_HEADER: auth_token
         })
         resp.raise_for_status()
         return self.parse_token_response(resp.json())

@@ -11,10 +11,14 @@ from util import extract_zipfile, get_directories_in_directory, load_json_file, 
 
 
 def build(options):
-    config = load_config(options.project_config)
-    config["build_number"] = options.build_number
-    if config:
-        builder = Builder(config)
+    config = load_config(options.config_file)
+    tokens = TokenFetcher(config).fetch_build_tokens()
+
+    #TODO: Why are we loading the conig here vs passing in the config file path?
+    project_config = load_config(options.project_config)
+    project_config["build_number"] = options.build_number
+    if project_config:
+        builder = Builder(config, tokens)
         builder.build()
 
 
@@ -48,7 +52,7 @@ def deploy(options):
     if getattr(options, "tokens_file", None):
         tokens = load_json_file(options.tokens_file)
     else:
-        tokens = TokenFetcher(config).fetch_tokes(metadata["uuid"])
+        tokens = TokenFetcher(config).fetch_deploy_tokens(metadata["uuid"])
 
     # Populate build tokens in tokens file if they exist
     build_tokens_file = os.path.join(staging_dir, "build_tokens.json")

@@ -1,8 +1,18 @@
 import os
 import re
 
+from util import get_all_file_paths
+
 
 TOKEN_REGEX = re.compile(r"\[\[.+?\]\]")
+
+
+def translate_tokenized_files(directory, extension, tokens, delete_after=True):
+    template_files = get_all_file_paths(directory, lambda filename: filename.endswith(extension))
+    for file in template_files:
+        out_file = file.replace(extension, "")
+
+        replace_tokens_in_file(file, tokens, out_file=out_file, delete_after=delete_after)
 
 
 def replace_tokens_in_file(in_file, tokens, out_file=None, delete_after=False):

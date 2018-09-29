@@ -5,19 +5,24 @@ import shutil
 import time
 import copy
 from util import create_zip_file
+from token_replacer import translate_tokenized_files
 
 
 class Builder:
 
-    def __init__(self, config):
+    def __init__(self, config, tokens):
         self.config = config
         self.workspace_root = os.getcwd()
+        self.tokens = tokens
 
     def build(self):
         #asume that we are already in the project root for now
         cwd = self.workspace_root
         root_directory = os.path.join(cwd, self.config["name"])
         build_directory = os.path.join(cwd, "build")
+
+        #replace any tokenized build files
+        translate_tokenized_files(root_directory, ".ptb", self.tokens)
 
         if not os.path.isdir(root_directory):
             print("Could not find project directory. Please make sure project name matches its directory name.")

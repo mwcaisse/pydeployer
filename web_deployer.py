@@ -2,8 +2,8 @@ import os
 import shutil
 import subprocess
 
-from token_replacer import replace_tokens_in_file
-from util import get_all_file_paths, empty_directory
+from token_replacer import translate_tokenized_files, replace_tokens_in_file
+
 
 
 class WebDeployer:
@@ -17,7 +17,7 @@ class WebDeployer:
             - Apps directory
             - project name
             - Temp directory that contains the extracted package
-            - tokens to translate the pyb files
+            - tokens to translate the ptd files
             - name of the project
 
         :return:
@@ -50,19 +50,12 @@ class WebDeployer:
         self.create_service_file(deploy_directory, publish_directory, service_name, run_file_path or "")
 
         # perform the tokenizer filling, if it throws an error, let it raise up..
-        print("WebDeploy: Translating pyb files")
-        self.translate_pyb_files(publish_directory, tokens)
+        print("WebDeploy: Translating ptd files")
+        translate_tokenized_files(publish_directory, ".ptd", tokens)
 
         # Restart the service when we are done with deploy
         print("WebDeploy: Starting service...")
         self.start_service(service_name)
-
-    def translate_pyb_files(self, staging_directory, tokens):
-        pyb_files = get_all_file_paths(staging_directory, lambda filename: filename.endswith(".pyb"))
-        for file in pyb_files:
-            out_file = file.replace(".pyb", "")
-
-            replace_tokens_in_file(file, tokens, out_file=out_file, delete_after=True)
 
     def create_run_script(self, deploy_directory, publish_directory, metadata, project_tokens):
         cont = True
@@ -82,7 +75,7 @@ class WebDeployer:
             "publish_dir": publish_directory,
             "module_name": metadata["moduleName"]
         }
-        template_file = self.get_template_file("run.sh.pyb")
+        template_file = self.get_template_file("run.sh.ptd")
         run_file = os.path.join(deploy_directory, "run.sh")
         replace_tokens_in_file(template_file, tokens, out_file=run_file, delete_after=False)
 
@@ -96,7 +89,7 @@ class WebDeployer:
             "publish_dir": publish_directory,
             "run_script": run_script
         }
-        template_file = self.get_template_file("service.pyb")
+        template_file = self.get_template_file("service.ptd")
 
         out_file = os.path.join(deploy_directory, "{0}.service".format(service_name))
         replace_tokens_in_file(template_file, tokens, out_file=out_file, delete_after=False)
