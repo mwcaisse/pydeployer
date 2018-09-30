@@ -18,7 +18,7 @@ def build(options):
     project_config = load_config(options.project_config)
     project_config["build_number"] = options.build_number
     if project_config:
-        builder = Builder(config, tokens)
+        builder = Builder(project_config, tokens)
         builder.build()
 
 
