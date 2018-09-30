@@ -17,11 +17,11 @@ class TokenFetcher:
             application_uuid=application_uuid,
             environment_uuid=self.config["environment_uuid"]
         ))
-        return self.make_request(url)
+        return self.make_token_request(url)
 
     def fetch_build_tokens(self):
         url = self.construct_url("build/token/")
-        return self.make_request(url)
+        return self.make_token_request(url)
 
     def make_token_request(self, url):
         auth_token = self.login_for_token()
