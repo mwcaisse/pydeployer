@@ -2,6 +2,7 @@
 
 import argparse
 import os
+import shutil
 
 from builder import Builder
 from database_deployer import FlywayDatabaseDeployer
@@ -87,6 +88,11 @@ def deploy(options):
             deployer = WebDeployer(dict())
             deployer.deploy(staging_dir, deploy_dir, tokens, project_name, metadata.get("web", {}))
 
+            print("Deploy: Ended deploying web.")
+
+    # delete staging directory once done
+    shutil.rmtree(staging_dir)
+
 
 def create_database_config(tokens, scripts_directory):
     config = {
@@ -114,6 +120,8 @@ if __name__ == "__main__":
     parser.add_argument("-d", "--project-directory", dest="project_directory", default=None)
     parser.add_argument("-t", "--tokens-file", dest="tokens_file", default=None,
                         help="Path to the file containing the deployment tokens")
+    parser.add_argument("-u", "--build-tokens-file", dest="build_tokens_file", default=None,
+                        help="Path to the file containing the build tokens")
 
     args = parser.parse_args()
 
