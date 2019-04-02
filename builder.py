@@ -46,6 +46,9 @@ class Builder:
                     subprocess.run("webpack", shell=True,
                                    cwd=os.path.join(root_directory, project["name"]))
 
+                print("Building web project " + project["name"])
+                print("Running: dotnet publish -c Release -o {0} -r linux-x64".format(os.path.join(build_directory, "web")))
+
                 subprocess.run("dotnet publish -c Release -o {0} -r linux-x64"
                                .format(os.path.join(build_directory, "web")), shell=True,
                                cwd=os.path.join(root_directory, project["name"]))
