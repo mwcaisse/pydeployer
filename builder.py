@@ -55,6 +55,27 @@ class Builder:
                     "serviceName": project.get("serviceName", project.get("name"))
                 }
 
+            elif project.get("type") == "static-web":
+                #TODO: We should share the package manager + webpack commands with web type project
+                if project.get("packageManager") == "yarn":
+                    subprocess.run("yarn install", shell=True,
+                                   cwd=os.path.join(root_directory, project["name"]))
+
+                if project.get("webpack", False):
+                    subprocess.run("webpack", shell=True,
+                                   cwd=os.path.join(root_directory, project["name"]))
+
+                if not project.get("gulpCommand"):
+                    print("Currently static-web only supports building with gulp. You must supply a gulp command.")
+                    return False
+
+                subprocess.run("gulp {target}".format(target=project.get("gulpCommand")), shell=True,
+                               cwd=os.path.join(root_directory, project["name"]))
+
+                #TODO: For now let's copy the output of the static web build to the "static-web" folder
+                shutil.copytree(os.path.join(root_directory, project["name"], project.get("distDirectory", "dist")),
+                                os.path.join(build_directory, "static-web"))
+
             elif project.get("type") == "database":
                 script_directory = os.path.join(root_directory, project.get("name"), project.get("scriptDirectory"))
                 shutil.copytree(script_directory, os.path.join(build_directory, "database", "scripts"))
