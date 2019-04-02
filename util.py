@@ -71,9 +71,15 @@ def get_directories_in_directory(directory, relative=True):
 
     return directories
 
+def pretty_string_to_bool(s):
+    if isinstance(s, bool):
+        return s # If it is already a bool, return its value
+    if isinstance(s, int):
+        return bool(int)
+    if isinstance(s, str):
+        s = s.lower()
+        if s in {"true", "t", "y", "yes"}:
+            return True
+        return False
 
-
-
-
-
-
+    return False # If it isn't a type we know how to deal with, return False

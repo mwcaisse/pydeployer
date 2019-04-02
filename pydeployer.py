@@ -8,7 +8,8 @@ from builder import Builder
 from database_deployer import FlywayDatabaseDeployer
 from token_fetcher import TokenFetcher
 from web_deployer import WebDeployer
-from util import extract_zipfile, get_directories_in_directory, load_json_file, load_config
+from web_static_deployer import WebStaticDeployer
+from util import extract_zipfile, get_directories_in_directory, load_json_file, load_config, pretty_string_to_bool
 
 
 def build(options):
@@ -67,6 +68,24 @@ def deploy(options):
     directories = get_directories_in_directory(staging_dir)
     print("Deploy: Parsing directories {0}".format(directories))
 
+    # Store the dictionary for the output paths for each different target type
+    target_outputs = {}
+
+    # If output path is defined in the config, use it as the default output directory
+    if "output_path" in config:
+        target_outputs[None] = config["output_path"]
+
+    # If targets have been specified in the config, load them
+    if "targets" in config:
+        target_outputs.update(config["targets"])
+
+    def get_output_path_for_target(target):
+        if target in target_outputs:
+            return target_outputs[target]
+        if None in target_outputs:
+            return target_outputs[None]
+        raise Exception("No output path defined for target {target}".format(target=target))
+
     for directory in directories:
         if directory == "database":
             print("Deploy: Starting deploying database.")
@@ -82,13 +101,27 @@ def deploy(options):
             print("Deploy: Ended deploying database.")
 
         elif directory == "web":
-            staging_dir = os.path.join(staging_dir, directory)
-            deploy_dir = os.path.join(config["output_path"], project_name)
+            project_config = metadata.get("web", {})
+            project_directory = os.path.join(staging_dir, directory)
+            deploy_dir = os.path.join(get_output_path_for_target(project_config.get("target", directory)), project_name)
 
             deployer = WebDeployer(dict())
-            deployer.deploy(staging_dir, deploy_dir, tokens, project_name, metadata.get("web", {}))
+            deployer.deploy(project_directory, deploy_dir, tokens, project_name, project_config)
 
             print("Deploy: Ended deploying web.")
+
+        elif directory == "web-static":
+            project_config = metadata.get("web", {})
+            project_directory = os.path.join(staging_dir, directory)
+            if pretty_string_to_bool(project_directory.get("deploy_as_root", "false")):
+                #If Deploy as Root is set, then we just deploy directly to the output directory
+                deploy_dir = get_output_path_for_target(project_config.get("target", directory))
+            else:
+                deploy_dir = os.path.join(get_output_path_for_target(project_config.get("target", directory)), project_name)
+
+            deployer = WebStaticDeployer(dict())
+            deployer.deploy(project_directory, deploy_dir, tokens, project_name, project_config)
+
 
     # delete staging directory once done
     shutil.rmtree(staging_dir)
