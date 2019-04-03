@@ -113,7 +113,7 @@ def deploy(options):
         elif directory == "web-static":
             project_config = metadata.get("web", {})
             project_directory = os.path.join(staging_dir, directory)
-            if pretty_string_to_bool(project_directory.get("deploy_as_root", "false")):
+            if pretty_string_to_bool(project_config.get("deploy_as_root", "false")):
                 #If Deploy as Root is set, then we just deploy directly to the output directory
                 deploy_dir = get_output_path_for_target(project_config.get("target", directory))
             else:
