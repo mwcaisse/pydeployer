@@ -1,6 +1,8 @@
 import os
 import shutil
 
+from token_replacer import translate_tokenized_files
+
 class WebStaticDeployer:
 
     def __init__(self, config):
@@ -25,3 +27,7 @@ class WebStaticDeployer:
         # Simply clear the deploy directory then copy everything from the staging directory to the deploy directory
         shutil.rmtree(deploy_directory)
         shutil.copytree(staging_directory, deploy_directory)
+
+        # perform the tokenizer filling, if it throws an error, let it raise up..
+        print("WebDeploy: Translating ptd files")
+        translate_tokenized_files(deploy_directory, ".ptd", tokens)
