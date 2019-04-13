@@ -2,13 +2,14 @@ import os
 import shutil
 
 from token_replacer import translate_tokenized_files
+from util import empty_directory
 
 class WebStaticDeployer:
 
     def __init__(self, config):
         self.config = config
 
-    def deploy(self, staging_directory, deploy_directory, tokens, project_name, project_metadata):
+    def deploy(self, staging_directory, deploy_directory, tokens, project_name, project_metadata, delete_root_dir=True):
         """
 
         :param staging_directory: Directory that the built files are staged in
@@ -25,7 +26,11 @@ class WebStaticDeployer:
             os.makedirs(deploy_directory)
 
         # Simply clear the deploy directory then copy everything from the staging directory to the deploy directory
-        shutil.rmtree(deploy_directory)
+        if delete_root_dir:
+            shutil.rmtree(deploy_directory)
+        else:
+            empty_directory(deploy_directory
+                            )
         shutil.copytree(staging_directory, deploy_directory)
 
         # perform the tokenizer filling, if it throws an error, let it raise up..
