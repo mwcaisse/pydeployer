@@ -2,7 +2,7 @@ import os
 import shutil
 
 from token_replacer import translate_tokenized_files
-from util import empty_directory
+from util import copytree, empty_directory
 
 class WebStaticDeployer:
 
@@ -28,10 +28,10 @@ class WebStaticDeployer:
         # Simply clear the deploy directory then copy everything from the staging directory to the deploy directory
         if delete_root_dir:
             shutil.rmtree(deploy_directory)
+            shutil.copytree(staging_directory, deploy_directory)
         else:
-            empty_directory(deploy_directory
-                            )
-        shutil.copytree(staging_directory, deploy_directory)
+            empty_directory(deploy_directory)
+            copytree(staging_directory, deploy_directory)
 
         # perform the tokenizer filling, if it throws an error, let it raise up..
         print("WebDeploy: Translating ptd files")

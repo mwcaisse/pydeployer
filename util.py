@@ -58,6 +58,22 @@ def empty_directory(directory):
             shutil.rmtree(file_path)
 
 
+def copytree(src, dest):
+    """
+        Copies the contents of the source directory into the dest directory. Dest directory must already exist
+    :param src:
+    :param dest:
+    :return:
+    """
+    for item in os.listdir(src):
+        s = os.path.join(src, item)
+        d = os.path.join(dest, item)
+        if os.path.isdir(s):
+            shutil.copytree(s, d)
+        else:
+            shutil.copy2(s, d)
+
+
 def get_directories_in_directory(directory, relative=True):
     directories = []
 
