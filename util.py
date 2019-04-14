@@ -51,6 +51,10 @@ def extract_zipfile(zip_file, destination):
 
 def empty_directory(directory):
     for file in os.listdir(directory):
+        if file.startswith("."):
+            # Ignore hidden files
+            continue
+
         file_path = os.path.join(directory, file)
         if os.path.isfile(file_path):
             os.remove(file_path)
