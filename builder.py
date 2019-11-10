@@ -87,11 +87,11 @@ class Builder:
                 database_metadata["scriptDirectory"] = "scripts"
                 metadata["database"] = database_metadata
 
-        build_tokens = self.create_build_tokens(build_directory)
+        self.create_build_tokens(build_directory)
         self.save_metadata(build_directory, metadata)
-        self.package(build_directory, build_tokens)
+        self.package(build_directory)
 
-    def package(self, build_directory, build_tokens):
+    def package(self, build_directory):
         zipfile = "{0}-{1}.pydist".format(
             self.config["name"],
             self.config["build_version"])
