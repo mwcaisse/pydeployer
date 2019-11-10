@@ -4,6 +4,7 @@ import json
 import shutil
 import time
 import copy
+import datetime
 from util import create_zip_file
 from token_replacer import translate_tokenized_files
 
@@ -86,12 +87,16 @@ class Builder:
                 database_metadata["scriptDirectory"] = "scripts"
                 metadata["database"] = database_metadata
 
-        self.create_build_tokens(build_directory)
+        build_tokens = self.create_build_tokens(build_directory)
         self.save_metadata(build_directory, metadata)
-        self.package(build_directory)
+        self.package(build_directory, build_tokens)
 
-    def package(self, build_directory):
-        zipfile = "{0}.pydist".format(self.config["name"])
+    def package(self, build_directory, build_tokens):
+        build_time = datetime.datetime.fromtimestamp(build_tokens["build_date"] / 1000)
+        zipfile = "{0}-{1}-{2}.pydist".format(
+            self.config["name"],
+            build_tokens["build_git_long_hash"],
+            build_time.strftime("%Y%m%d%H%M%S%f"))
         create_zip_file(build_directory, zipfile)
 
     def run_git_command(self, command):
@@ -111,6 +116,8 @@ class Builder:
 
         with open(os.path.join(directory, "build_tokens.json"), "w") as tokens_file:
             json.dump(tokens, tokens_file)
+
+        return tokens
 
     def save_metadata(self, directory, metadata):
         with open(os.path.join(directory, "metadata.json"), "w") as metadata_file:
