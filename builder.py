@@ -92,11 +92,9 @@ class Builder:
         self.package(build_directory, build_tokens)
 
     def package(self, build_directory, build_tokens):
-        build_time = datetime.datetime.fromtimestamp(build_tokens["build_date"] / 1000)
-        zipfile = "{0}-{1}-{2}.pydist".format(
+        zipfile = "{0}-{1}.pydist".format(
             self.config["name"],
-            build_tokens["build_git_long_hash"],
-            build_time.strftime("%Y%m%d%H%M%S%f"))
+            self.config["build_version"])
         create_zip_file(build_directory, zipfile)
 
     def run_git_command(self, command):
@@ -112,6 +110,7 @@ class Builder:
             "build_git_long_hash": self.run_git_command("rev-parse HEAD"),
             "build_git_branch": "master",  # hard coding for life
             "build_number": self.config["build_number"],
+            "build_version": self.config["build_version"]
         }
 
         with open(os.path.join(directory, "build_tokens.json"), "w") as tokens_file:

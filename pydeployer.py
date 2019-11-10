@@ -19,6 +19,7 @@ def build(options):
     #TODO: Why are we loading the conig here vs passing in the config file path?
     project_config = load_config(options.project_config)
     project_config["build_number"] = options.build_number
+    project_config["build_version"] = options.build_version
     if project_config:
         builder = Builder(project_config, tokens)
         builder.build()
@@ -148,6 +149,7 @@ if __name__ == "__main__":
     parser.add_argument("deploy_file", nargs="?", default=None,
                         help="File to deploy. Required if deploy is specified as command")
     parser.add_argument("-b", "--build-number", dest="build_number", default="0")
+    parser.add_argument("-v", "--version", dest="build_version", default="0.0.1")
     parser.add_argument("-c", "--config-file", dest="config_file", default="/opt/pydeployer/conf/config.yaml",
                         help="Location of the pydeployer configuration file")
     parser.add_argument("-p", "--project-config", dest="project_config", default="config.yaml",
