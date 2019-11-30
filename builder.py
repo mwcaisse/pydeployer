@@ -33,7 +33,8 @@ class Builder:
 
         #meta data for the build
         metadata = {
-            "uuid": self.config["uuid"]
+            "uuid": self.config["uuid"],
+            "name": self.config["name"],
         }
 
         # Perform any project specific build steps

@@ -3,6 +3,7 @@
 import argparse
 import os
 import shutil
+import re
 
 from builder import Builder
 from database_deployer import FlywayDatabaseDeployer
@@ -25,14 +26,25 @@ def build(options):
         builder.build()
 
 
+def get_project_name(zipfile_name, metadata):
+    if "name" in metadata:
+        return metadata["name"].lower()
+    matches = re.match(r"(.*)-\d+\.\d+\.\d+(-alpha.\d+)?\.pydist", zipfile_name)
+    if matches:
+        # if the package name has the version in it, then return the first part of the file as name
+        return matches.group(1).lower()
+    # Otherwise default to the original logic
+    return zipfile_name.split(".")[0].lower()
+
+
 def deploy(options):
     #Load the pydeployer config
     config = load_config(options.config_file)
 
     zipfile_name = os.path.basename(options.deploy_file)
-    project_name = zipfile_name.split(".")[0].lower()  # TODO: only allow one dot for now
+    staging_dir_prefix = zipfile_name.split(".pydist")[0].lower().replace(".", "-")  # TODO: only allow one dot for now
 
-    staging_dir = os.path.join(os.getcwd(), project_name + "_pkg")
+    staging_dir = os.path.join(os.getcwd(), staging_dir_prefix + "_pkg")
     os.makedirs(staging_dir)
 
     # Extract the zip file
@@ -48,6 +60,8 @@ def deploy(options):
         metadata = load_json_file(metadata_file)
     else:
         raise Exception("Unable to load package metadata!")
+
+    project_name = get_project_name(zipfile_name, metadata)
 
     #Fetch the tokens
     # if there was a token file specified as a parameter use the tokens from there
