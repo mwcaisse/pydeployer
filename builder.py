@@ -18,15 +18,19 @@ class Builder:
     def build(self):
         # assume that we are already in the project root for now
         cwd = self.workspace_root
-        root_directory = os.path.join(cwd, self.config["name"])
-        build_directory = os.path.join(cwd, "build")
+        root_directory = os.path.join(cwd, self.config.get("directory", self.config["name"]) or "")
+        build_directory = os.path.join("/tmp", "pydeployer", self.config["name"], "build")
+
+        if not os.path.isdir(build_directory):
+            os.makedirs(build_directory)
+
+        if not os.path.isdir(root_directory):
+            print("Could not find project directory. Please make sure project name matches its directory name or "
+                  "specify the directory name with 'directory' directive.")
+            return False
 
         # replace any tokenized build files
         translate_tokenized_files(root_directory, ".ptb", self.tokens)
-
-        if not os.path.isdir(root_directory):
-            print("Could not find project directory. Please make sure project name matches its directory name.")
-            return False
 
         # TODO: Should add some sort of conditional around running this.
         subprocess.run("dotnet restore", shell=True, cwd=root_directory)
@@ -45,7 +49,7 @@ class Builder:
 
         self.create_build_tokens(build_directory)
         self.save_metadata(build_directory, metadata)
-        self.package(build_directory)
+        self.package(self.workspace_root, build_directory)
 
     def build_project(self, project, root_directory, build_directory, metadata):
         project_directory = os.path.join(root_directory, project.get("directory", project["name"]) or "")
@@ -103,11 +107,13 @@ class Builder:
 
         return True
 
-    def package(self, build_directory):
-        zipfile = "{0}-{1}.pydist".format(
+    def package(self, dest_directory, build_directory):
+        zipfile_name = "{0}-{1}.pydist".format(
             self.config["name"],
             self.config["build_version"])
-        create_zip_file(build_directory, zipfile)
+        zip_file = os.path.join(dest_directory, zipfile_name)
+        create_zip_file(build_directory, zip_file)
+        return zip_file
 
     def run_git_command(self, command):
         command = "git -C {0} {1}".format(self.workspace_root, command)
