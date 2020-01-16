@@ -5,7 +5,7 @@ pkgdesc="Python app for building/deploying .NET applications"
 arch=('any')
 url="https://github.com/mwcaisse/pydeployer"
 license=('MIT')
-depends=('python>=3.7.0' 'python-requests>=2.19.1' 'python-urllib3>=1.23' "python-yaml>=3.13")
+depends=('python>=3.7.0' 'python-requests>=2.22.0' 'python-urllib3>=1.25.6' "python-yaml>=5.1.2")
 
 
 source=("$pkgname-$pkgver.tar.gz::https://github.com/mwcaisse/pydeployer/archive/master.tar.gz")
